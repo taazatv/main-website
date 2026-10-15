@@ -8,7 +8,8 @@ import { OLD_CATEGORY, getArticle, getBreaking, getCategory } from "@/lib/taaza"
 export const revalidate = 300;
 
 /** Imported stories use "/article/<old-site id>-<slug>". */
-const realId = (slug: string) => slug.match(/^(\d+)-/)?.[1];
+// old-site ids are 5+ digits; sample slugs can start with small numbers ("16-maoists-…")
+const realId = (slug: string) => slug.match(/^(\d{5,})-/)?.[1];
 
 export function generateStaticParams() {
   return STORIES.map((s) => ({ slug: s.slug }));
