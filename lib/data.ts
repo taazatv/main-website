@@ -421,7 +421,7 @@ export function content(lang: Lang) {
         { time: "07:00", show: "Morning Headlines", host: "Priya Singh" },
         { time: "09:00", show: "News 100", host: "Rahul Mehra" },
         { time: "12:00", show: "Midday Report", host: "Neha Gupta" },
-        { time: "15:00", show: "Prime Debate", host: "Ankit Verma", now: true },
+        { time: "15:00", show: "Prime Debate", host: "Ankit Verma" },
         { time: "18:00", show: "Sports Roundup", host: "Sameer Khan" },
         { time: "20:00", show: "The Verdict", host: "Meera Joshi" },
         { time: "22:00", show: "Night Bulletin", host: "Vivek Rai" },
@@ -430,25 +430,27 @@ export function content(lang: Lang) {
         { time: "07:00", show: "सुबह की सुर्खियां", host: "प्रिया सिंह" },
         { time: "09:00", show: "न्यूज़ 100", host: "राहुल मेहरा" },
         { time: "12:00", show: "दोपहर का हाल", host: "नेहा गुप्ता" },
-        { time: "15:00", show: "हल्ला बोल", host: "अंकित वर्मा", now: true },
+        { time: "15:00", show: "हल्ला बोल", host: "अंकित वर्मा" },
         { time: "18:00", show: "खेल राउंडअप", host: "समीर खान" },
         { time: "20:00", show: "आज का फैसला", host: "मीरा जोशी" },
         { time: "22:00", show: "रात की खबर", host: "विवेक राय" },
       ],
-    ) as { time: string; show: string; host: string; now?: boolean }[],
+    ) as { time: string; show: string; host: string }[],
     footA: pick(["Breaking News", "National News", "International News", "Entertainment News"], ["ब्रेकिंग न्यूज़", "देश", "दुनिया", "मनोरंजन"]),
     footB: pick(["Sports News", "Health News", "Video News", "Live TV"], ["खेल", "हेल्थ", "वीडियो", "लाइव TV"]),
-    footC: pick(["About us", "Advertise", "Careers", "Contact us", "Terms & Conditions", "RSS · Sitemap"], ["हमारे बारे में", "विज्ञापन", "करियर", "संपर्क करें", "नियम व शर्तें", "RSS · साइटमैप"]),
+    footC: pick(["About us", "Mission & Vision", "Advertise", "Careers", "Contact us", "Terms & Conditions"], ["हमारे बारे में", "मिशन और विज़न", "विज्ञापन", "करियर", "संपर्क करें", "नियम व शर्तें"]),
   };
 }
 
 export const footAHref = ["/", "/category/national", "/category/international-news", "/category/entertainment"];
 export const footBHref = ["/category/sports", "/category/health", "/video", "/live-tv"];
+export const footCHref = ["/about", "/about#mission", "/contact#advertise", "/contact#careers", "/contact", "https://taazatv.com/terms-conditions.php"];
 
 export const SOCIALS = [
-  { name: "Instagram", bg: "#d6249f", paths: ["M17 2H7a5 5 0 0 0-5 5v10a5 5 0 0 0 5 5h10a5 5 0 0 0 5-5V7a5 5 0 0 0-5-5z", "M16 11.4a4 4 0 1 1-3.4-3.4 4 4 0 0 1 3.4 3.4z", "M17.5 6.5h.01"] },
-  { name: "X", bg: "#121212", paths: ["M4 3l7.5 9.5L4.5 21", "M20 3l-7.5 9.5L19.5 21", "M4 3h4l12 18h-4z"] },
-  { name: "LinkedIn", bg: "#0a66c2", paths: ["M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4v-7a6 6 0 0 1 6-6z", "M6 9H2v12h4z", "M4 4a2 2 0 1 1 0 .01"] },
-  { name: "YouTube", bg: "#ff0000", paths: ["M22.5 7.5a3 3 0 0 0-2.1-2.1C18.6 5 12 5 12 5s-6.6 0-8.4.4A3 3 0 0 0 1.5 7.5 31 31 0 0 0 1 12a31 31 0 0 0 .5 4.5 3 3 0 0 0 2.1 2.1C5.4 19 12 19 12 19s6.6 0 8.4-.4a3 3 0 0 0 2.1-2.1A31 31 0 0 0 23 12a31 31 0 0 0-.5-4.5z", "M10 8.5l6 3.5-6 3.5z"] },
-  { name: "Facebook", bg: "#1877f2", paths: ["M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"] },
+  // TODO: confirm handle; the old site mentions Instagram but never linked to it
+  { name: "Instagram", href: "https://www.instagram.com/taazatv/", bg: "#d6249f", paths: ["M17 2H7a5 5 0 0 0-5 5v10a5 5 0 0 0 5 5h10a5 5 0 0 0 5-5V7a5 5 0 0 0-5-5z", "M16 11.4a4 4 0 1 1-3.4-3.4 4 4 0 0 1 3.4 3.4z", "M17.5 6.5h.01"] },
+  { name: "Facebook", href: "https://www.facebook.com/taazabengal", bg: "#1877f2", paths: ["M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"] },
+  { name: "X", href: "https://x.com/taazatv", bg: "#121212", paths: ["M4 3l7.5 9.5L4.5 21", "M20 3l-7.5 9.5L19.5 21", "M4 3h4l12 18h-4z"] },
+  { name: "YouTube", href: "https://www.youtube.com/@taazabengal1632", bg: "#ff0000", paths: ["M22.5 7.5a3 3 0 0 0-2.1-2.1C18.6 5 12 5 12 5s-6.6 0-8.4.4A3 3 0 0 0 1.5 7.5 31 31 0 0 0 1 12a31 31 0 0 0 .5 4.5 3 3 0 0 0 2.1 2.1C5.4 19 12 19 12 19s6.6 0 8.4-.4a3 3 0 0 0 2.1-2.1A31 31 0 0 0 23 12a31 31 0 0 0-.5-4.5z", "M10 8.5l6 3.5-6 3.5z"] },
+  { name: "WhatsApp", href: "https://api.whatsapp.com/send?phone=919831669998", bg: "#25d366", paths: ["M3 21l1.7-5A9 9 0 1 1 8 19.3z", "M9 8.5c0 3.5 3 6.5 6.5 6.5l1.5-1.5-2-1-1 1c-1.2-.5-2.5-1.8-3-3l1-1-1-2z"] },
 ];

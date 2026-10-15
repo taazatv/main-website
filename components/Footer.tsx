@@ -3,7 +3,8 @@
 import Link from "next/link";
 import { useId, useState, type ReactNode } from "react";
 import { useApp } from "./AppProvider";
-import { content, footAHref, footBHref, SOCIALS } from "@/lib/data";
+import { content, footAHref, footBHref, footCHref, SOCIALS } from "@/lib/data";
+import { GROUP_COMPANIES, LEGAL } from "@/lib/links";
 import AppLinks from "./AppLinks";
 
 function FooterGroup({ title, children, companies = false }: { title: string; children: ReactNode; companies?: boolean }) {
@@ -33,7 +34,7 @@ export default function Footer() {
         <div className="footer-socials">
           <span>{t.follow}</span>
           <div className="socials">
-            {SOCIALS.map((so) => <a key={so.name} href="#" aria-label={so.name} title={so.name} className="soc" style={{ background: so.bg }}>
+            {SOCIALS.map((so) => <a key={so.name} href={so.href} target="_blank" rel="noopener noreferrer" aria-label={so.name} title={so.name} className="soc" style={{ background: so.bg }}>
               <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                 {so.paths.map((d) => <path key={d} d={d} />)}
               </svg>
@@ -54,19 +55,18 @@ export default function Footer() {
           {c.footB.map((x, i) => <Link key={x} href={footBHref[i]}>{x}</Link>)}
         </FooterGroup>
         <FooterGroup title={t.quickLinks}>
-          {c.footC.map((x) => <a key={x} href="#">{x}</a>)}
+          {c.footC.map((x, i) => footCHref[i].startsWith("http") ? <a key={x} href={footCHref[i]} target="_blank" rel="noopener noreferrer">{x}</a> : <Link key={x} href={footCHref[i]}>{x}</Link>)}
         </FooterGroup>
       </div>
 
       <FooterGroup title={t.group} companies>
-        <span>Taaza TV — National Hindi Channel from Eastern India</span>
-        <span>Chhapte Chhapte — Hindi Daily Newspaper</span>
-        <span>Taaza Digital</span>
-        <span>Medha Samman</span>
+        {GROUP_COMPANIES.map((g) => g.href
+          ? <a key={g.name} href={g.href} target="_blank" rel="noopener noreferrer" className="fg-co">{lang === "hi" ? g.hi : g.name} — {g.desc}</a>
+          : <span key={g.name}>{lang === "hi" ? g.hi : g.name} — {g.desc}</span>)}
       </FooterGroup>
       <div className="fcopy">
         <span>© 2026 Taaza TV. All rights reserved. • West Bengal · Bihar · Jharkhand · Uttar Pradesh</span>
-        <span>Terms and Conditions • Privacy Policy</span>
+        <span><a href={LEGAL.terms} target="_blank" rel="noopener noreferrer">Terms and Conditions</a> • <a href={LEGAL.privacy} target="_blank" rel="noopener noreferrer">Privacy Policy</a></span>
       </div>
     </footer>
   );

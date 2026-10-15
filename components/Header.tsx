@@ -75,7 +75,7 @@ export default function Header() {
         <div className="hdr-right">
           <div className="socials">
             {SOCIALS.map((so) => (
-              <a key={so.name} href="#" aria-label={so.name} title={so.name} className="soc" style={{ background: so.bg }}>
+              <a key={so.name} href={so.href} target="_blank" rel="noopener noreferrer" aria-label={so.name} title={so.name} className="soc" style={{ background: so.bg }}>
                 <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                   {so.paths.map((d) => <path key={d} d={d} />)}
                 </svg>

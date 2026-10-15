@@ -5,11 +5,14 @@ import { useApp } from "./AppProvider";
 import { Ph, SecHead } from "./ui";
 import { STATES, STATE_HI, content, edition } from "@/lib/data";
 import { storyHref } from "@/lib/stories";
+import { useOnAir } from "./useOnAir";
+import LivePlayer from "./LivePlayer";
 
 export default function HomePage() {
   const { t, lang, stateName, setStateName } = useApp();
   const c = content(lang);
   const sd = edition(lang, stateName);
+  const onAir = useOnAir(c.schedule);
 
   return (
     <div>
@@ -56,10 +59,13 @@ export default function HomePage() {
         </div>
 
         <div className="pad26">
+          <Link href="/live-tv" className="lk wl-head"><span className="blink" /><span>{t.watchLive}</span></Link>
+          <div className="ph ar-16-9 wl-player">
+            <LivePlayer compact />
+            <span className="wl-live"><i />LIVE</span>
+          </div>
           <Link href="/live-tv" className="lk">
-            <div className="wl-head"><span className="blink" /><span>{t.watchLive}</span></div>
-            <Ph src="/taaza/watch-live.jpg" className="ar-16-9 wl-img"><span className="play-tri" /></Ph>
-            <div className="wl-title">{t.liveShow}</div>
+            <div className="wl-title hv-t">{onAir >= 0 ? c.schedule[onAir].show : t.liveShow}</div>
           </Link>
           <div className="mw">
             <div className="mw-head">{t.mostWatched}</div>

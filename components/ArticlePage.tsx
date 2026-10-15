@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { useApp } from "./AppProvider";
 import { Ph } from "./ui";
 import { content } from "@/lib/data";
+import { CONTACT } from "@/lib/links";
 import { articleCopy, getStory, relatedStories, storyHref } from "@/lib/stories";
 
 type Comment = { name: string; text: string; when: string };
@@ -188,7 +189,7 @@ export default function ArticlePage({ slug }: { slug: string }) {
           <div className="alerts on-dark">
             <div className="t1">{t.alertsTitle}</div>
             <div className="t2">{t.alertsBody}</div>
-            <button className="btn btn-primary">{t.joinNow}</button>
+            <a href={CONTACT.whatsappLink} target="_blank" rel="noopener noreferrer" className="btn btn-primary">{t.joinNow}</a>
           </div>
         </aside>
       </div>
