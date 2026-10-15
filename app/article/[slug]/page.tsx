@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { notFound, redirect } from "next/navigation";
+import { notFound } from "next/navigation";
+import ArticleFallback from "@/components/ArticleFallback";
 import ArticlePage from "@/components/ArticlePage";
 import RealArticle from "@/components/RealArticle";
 import { STORIES, getStory } from "@/lib/stories";
@@ -32,7 +33,7 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
   if (id) {
     const a = await getArticle(id);
     // the old site is unreachable from here: send the reader to the same story there
-    if (!a) redirect(`https://taazatv.com/article/news&${id}&en&West%20Bengal`);
+    if (!a) return <ArticleFallback url={`https://taazatv.com/article/news&${id}&en&West%20Bengal`} />;
     const catSlug = Object.entries(OLD_CATEGORY).find(([, v]) => v.toLowerCase() === a.category?.toLowerCase())?.[0];
     const pool = catSlug ? await getCategory(catSlug) : await getBreaking();
     const related = pool.filter((x) => x.id !== id).slice(0, 5);
