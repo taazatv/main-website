@@ -24,12 +24,18 @@ const REVALIDATE = 300; // seconds; the old site's admin panel stays the newsroo
 async function page(path: string): Promise<string | null> {
   try {
     const res = await fetch(`${ORIGIN}/${path}`, {
-      headers: { "User-Agent": "Mozilla/5.0 (compatible; TaazaTV-Next/1.0)" },
+      headers: {
+        "User-Agent": "Mozilla/5.0 (compatible; TaazaTV-Next/1.0)",
+        // Lets taazatv.com's Cloudflare WAF skip bot checks for this site (set the same value in a WAF skip rule)
+        ...(process.env.TAAZA_FEED_KEY ? { "X-Taaza-Feed": process.env.TAAZA_FEED_KEY } : {}),
+      },
       next: { revalidate: REVALIDATE },
       signal: AbortSignal.timeout(12000),
     });
+    if (!res.ok) console.error(`[taaza] ${res.status} ${path}`);
     return res.ok ? await res.text() : null;
-  } catch {
+  } catch (e) {
+    console.error(`[taaza] fetch failed ${path}:`, e instanceof Error ? e.message : e);
     return null;
   }
 }
@@ -72,7 +78,10 @@ export async function getArticle(id: string): Promise<Article | null> {
   if (!/^\d+$/.test(id)) return null;
   const html = await page(`article/news&${id}&en&${q(DEFAULT_STATE)}`);
   const a = html ? parseArticle(id, html) : null;
-  if (!a) return null;
+  if (!a) {
+    if (html) console.error(`[taaza] article ${id}: could not parse (${html.length} bytes) ${html.slice(0, 200).replace(/\s+/g, " ")}`);
+    return null;
+  }
   return { ...a, bodyHtml: clean(a.bodyHtml) };
 }
 
@@ -111,6 +120,9 @@ export type HomeNews = {
   sportTiles: SportTile[];
 };
 
+/** Thrown when taazatv.com can't be reached, so a cached page keeps its last good news instead of sample content. */
+export class SourceUnavailable extends Error {}
+
 export async function getHomeNews(): Promise<HomeNews> {
   const [breaking, national, world, entertainment, sports, health, premium, wb, bihar, jh, up, vid, shorts, sportTiles] = await Promise.all([
     getBreaking(),
@@ -128,6 +140,7 @@ export async function getHomeNews(): Promise<HomeNews> {
     getYouTube("shorts"),
     getSportTiles(),
   ]);
+  if (breaking.length === 0 && national.length === 0) throw new SourceUnavailable("taazatv.com unreachable");
   return {
     breaking, national, world, entertainment, sports, health, premium,
     states: { "West Bengal": wb, Bihar: bihar, Jharkhand: jh, "Uttar Pradesh": up },

@@ -195,7 +195,7 @@ export default function Header({ headlines = [], ad }: { headlines?: { title: st
                   {headlines.map((h) => <span key={h.href}><Link href={h.href} className="ticker-link" tabIndex={copy === 1 ? -1 : undefined}>{h.title}</Link>{"  •  "}</span>)}
                 </span>
               ))
-              : <><span>{t.ticker}</span><span aria-hidden="true">{t.ticker}</span></>}
+              : <><span>{t.tagline}</span><span aria-hidden="true">{"   •   "}{t.tagline}</span></>}
           </div>
         </div>
       </div>
