@@ -123,6 +123,14 @@ export type HomeNews = {
 /** Thrown when taazatv.com can't be reached, so a cached page keeps its last good news instead of sample content. */
 export class SourceUnavailable extends Error {}
 
+/**
+ * During `next build` there is no earlier version to keep, so let the page render (with its fallback
+ * content) instead of failing the deploy; at runtime, fail so ISR keeps serving the last good page.
+ */
+export function failIfUnavailable(unavailable: boolean, what: string) {
+  if (unavailable && process.env.NEXT_PHASE !== "phase-production-build") throw new SourceUnavailable(what);
+}
+
 export async function getHomeNews(): Promise<HomeNews> {
   const [breaking, national, world, entertainment, sports, health, premium, wb, bihar, jh, up, vid, shorts, sportTiles] = await Promise.all([
     getBreaking(),
@@ -140,7 +148,7 @@ export async function getHomeNews(): Promise<HomeNews> {
     getYouTube("shorts"),
     getSportTiles(),
   ]);
-  if (breaking.length === 0 && national.length === 0) throw new SourceUnavailable("taazatv.com unreachable");
+  failIfUnavailable(breaking.length === 0 && national.length === 0, "taazatv.com unreachable");
   return {
     breaking, national, world, entertainment, sports, health, premium,
     states: { "West Bengal": wb, Bihar: bihar, Jharkhand: jh, "Uttar Pradesh": up },
@@ -161,7 +169,9 @@ export async function getHeaderAd(): Promise<HeaderAd | null> {
     const m = html.match(new RegExp(String.raw`<a[^>]*href="([^"]+)"[^>]*>\s*<img[^>]*class="[^"]*${cls}[^"]*"[^>]*>`));
     if (!m) return null;
     const src = m[0].match(/src="([^"]+)"/)?.[1];
-    return src ? { href: m[1], src: src.replace(/ /g, "%20") } : null;
+    const file = src?.split("/admin/resources/ads/")[1];
+    // proxied through /partner-img so ad blockers don't hide it (see app/partner-img/route.ts)
+    return file ? { href: m[1], src: `/partner-img?f=${encodeURIComponent(decodeURIComponent(file))}` } : null;
   };
   const web = slot("web-banner");
   const mobile = slot("mobile-banner");

@@ -207,7 +207,7 @@ export default function Header({ headlines = [], ad }: { headlines?: { title: st
             <picture>
               <source media="(max-width: 600px)" srcSet={ad.mobile} />
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={ad.web} alt="Advertisement" />
+              <img src={ad.web} alt="Taaza TV partner banner" />
             </picture>
           </a>
         ) : (
