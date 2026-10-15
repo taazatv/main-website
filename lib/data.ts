@@ -28,7 +28,7 @@ export const en = {
   liveUpdates: "Live Updates", alsoRead: "Also Read", atAGlance: "AT A GLANCE",
   alertsTitle: "Taaza TV Alerts", alertsBody: "Get breaking news on WhatsApp, the moment it happens.",
   joinNow: "Join now", onAir: "ON AIR NOW", schedule: "Today's Schedule",
-  videoHub: "Videos & Shorts", tabShorts: "Shorts", tabBulletins: "Bulletins", tabDebates: "Debates",
+  videoHub: "Videos & Shorts", tabShorts: "Shorts", tabBulletins: "Videos", tabDebates: "Live",
   footerTagline: "A national Hindi and English news channel from eastern India. News in your language, from your state.",
   popularCats: "POPULAR CATEGORIES", more: "MORE", quickLinks: "QUICK LINKS", group: "GROUP OF COMPANIES",
   leadKicker: "NATIONAL · UTTAR PRADESH • 12 MIN AGO",
@@ -65,7 +65,7 @@ export const hi: Dict = {
   liveUpdates: "लाइव अपडेट्स", alsoRead: "ये भी पढ़ें", atAGlance: "एक नज़र में",
   alertsTitle: "Taaza TV अलर्ट", alertsBody: "ब्रेकिंग न्यूज़ सीधे WhatsApp पर पाएं।",
   joinNow: "जॉइन करें", onAir: "अभी चल रहा है", schedule: "आज का शेड्यूल",
-  videoHub: "वीडियो और शॉर्ट्स", tabShorts: "शॉर्ट्स", tabBulletins: "बुलेटिन", tabDebates: "डिबेट",
+  videoHub: "वीडियो और शॉर्ट्स", tabShorts: "शॉर्ट्स", tabBulletins: "वीडियो", tabDebates: "लाइव",
   footerTagline: "पूर्वी भारत से हिंदी और अंग्रेज़ी न्यूज़ चैनल। आपकी भाषा में, आपके राज्य की खबर।",
   popularCats: "लोकप्रिय सेक्शन", more: "और", quickLinks: "क्विक लिंक", group: "ग्रुप ऑफ कंपनीज़",
   leadKicker: "देश · उत्तर प्रदेश • 12 मिनट पहले",
@@ -447,10 +447,9 @@ export const footBHref = ["/category/sports", "/category/health", "/video", "/li
 export const footCHref = ["/about", "/about#mission", "/contact#advertise", "/contact#careers", "/contact", "https://taazatv.com/terms-conditions.php"];
 
 export const SOCIALS = [
-  // TODO: confirm handle; the old site mentions Instagram but never linked to it
-  { name: "Instagram", href: "https://www.instagram.com/taazatv/", bg: "#d6249f", paths: ["M17 2H7a5 5 0 0 0-5 5v10a5 5 0 0 0 5 5h10a5 5 0 0 0 5-5V7a5 5 0 0 0-5-5z", "M16 11.4a4 4 0 1 1-3.4-3.4 4 4 0 0 1 3.4 3.4z", "M17.5 6.5h.01"] },
+  { name: "Instagram", href: "https://www.instagram.com/taazatvchannel/", bg: "#d6249f", paths: ["M17 2H7a5 5 0 0 0-5 5v10a5 5 0 0 0 5 5h10a5 5 0 0 0 5-5V7a5 5 0 0 0-5-5z", "M16 11.4a4 4 0 1 1-3.4-3.4 4 4 0 0 1 3.4 3.4z", "M17.5 6.5h.01"] },
   { name: "Facebook", href: "https://www.facebook.com/taazabengal", bg: "#1877f2", paths: ["M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"] },
   { name: "X", href: "https://x.com/taazatv", bg: "#121212", paths: ["M4 3l7.5 9.5L4.5 21", "M20 3l-7.5 9.5L19.5 21", "M4 3h4l12 18h-4z"] },
-  { name: "YouTube", href: "https://www.youtube.com/@taazabengal1632", bg: "#ff0000", paths: ["M22.5 7.5a3 3 0 0 0-2.1-2.1C18.6 5 12 5 12 5s-6.6 0-8.4.4A3 3 0 0 0 1.5 7.5 31 31 0 0 0 1 12a31 31 0 0 0 .5 4.5 3 3 0 0 0 2.1 2.1C5.4 19 12 19 12 19s6.6 0 8.4-.4a3 3 0 0 0 2.1-2.1A31 31 0 0 0 23 12a31 31 0 0 0-.5-4.5z", "M10 8.5l6 3.5-6 3.5z"] },
+  { name: "YouTube", href: "https://www.youtube.com/@taazatv1632", bg: "#ff0000", paths: ["M22.5 7.5a3 3 0 0 0-2.1-2.1C18.6 5 12 5 12 5s-6.6 0-8.4.4A3 3 0 0 0 1.5 7.5 31 31 0 0 0 1 12a31 31 0 0 0 .5 4.5 3 3 0 0 0 2.1 2.1C5.4 19 12 19 12 19s6.6 0 8.4-.4a3 3 0 0 0 2.1-2.1A31 31 0 0 0 23 12a31 31 0 0 0-.5-4.5z", "M10 8.5l6 3.5-6 3.5z"] },
   { name: "WhatsApp", href: "https://api.whatsapp.com/send?phone=919831669998", bg: "#25d366", paths: ["M3 21l1.7-5A9 9 0 1 1 8 19.3z", "M9 8.5c0 3.5 3 6.5 6.5 6.5l1.5-1.5-2-1-1 1c-1.2-.5-2.5-1.8-3-3l1-1-1-2z"] },
 ];

@@ -1,5 +1,8 @@
 import HomePage from "@/components/HomePage";
+import { getHomeNews } from "@/lib/taaza";
 
-export default function Page() {
-  return <HomePage />;
+export const revalidate = 300;
+
+export default async function Page() {
+  return <HomePage news={await getHomeNews()} />;
 }

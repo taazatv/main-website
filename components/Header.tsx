@@ -19,7 +19,7 @@ const MOBILE_TOPICS = [
   { label: "Video", hi: "वीडियो", href: "/video" },
 ];
 
-export default function Header() {
+export default function Header({ headlines = [], ad }: { headlines?: { title: string; href: string }[]; ad?: { href: string; web: string; mobile: string } | null }) {
   const { t, lang, setLang, theme, toggleTheme, stateName, setStateModalOpen } = useApp();
   const pathname = usePathname();
   const router = useRouter();
@@ -189,18 +189,33 @@ export default function Header() {
         <div className="ticker-tag">{t.breaking}</div>
         <div className="ticker-track" tabIndex={0} aria-label={t.breaking}>
           <div className="ticker-run" key={lang}>
-            <span>{t.ticker}</span>
-            <span aria-hidden="true">{t.ticker}</span>
+            {headlines.length > 0
+              ? [0, 1].map((copy) => (
+                <span key={copy} aria-hidden={copy === 1 || undefined}>
+                  {headlines.map((h) => <span key={h.href}><Link href={h.href} className="ticker-link" tabIndex={copy === 1 ? -1 : undefined}>{h.title}</Link>{"  •  "}</span>)}
+                </span>
+              ))
+              : <><span>{t.ticker}</span><span aria-hidden="true">{t.ticker}</span></>}
           </div>
         </div>
       </div>
 
       {/* ad */}
       <div className="m-ad">
-        <Link href="/category/medha-samman-2026">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/taaza/medha-samman-banner.jpg" alt="Check your name in the Medha Samman list" />
-        </Link>
+        {ad ? (
+          <a href={ad.href} target="_blank" rel="noopener noreferrer sponsored">
+            <picture>
+              <source media="(max-width: 600px)" srcSet={ad.mobile} />
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={ad.web} alt="Advertisement" />
+            </picture>
+          </a>
+        ) : (
+          <Link href="/category/medha-samman-2026">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/taaza/medha-samman-banner.jpg" alt="Check your name in the Medha Samman list" />
+          </Link>
+        )}
       </div>
     </>
   );
