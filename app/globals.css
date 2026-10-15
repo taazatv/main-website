@@ -73,6 +73,8 @@
 * { margin: 0; scrollbar-width: none; -ms-overflow-style: none; }
 *::-webkit-scrollbar { width: 0; height: 0; display: none; }
 html, body { background: var(--page-bg); }
+/* iOS Safari inflates text in very wide blocks (e.g. the ticker run); keep authored sizes */
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
 body {
   color: var(--color-text);
   font-family: var(--font);
@@ -659,6 +661,7 @@ button { font: inherit; }
   .shapes { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
   .shape { padding: 12px 8px; }
   .ticker-tag { font-size: 9px; padding-inline: 8px; }
+  .ticker-run span { font-size: 11.5px; }
 }
 @media (max-width: 380px) {
   .g3, .g2, .cat-grid, .r-foot { grid-template-columns: minmax(0, 1fr); }
