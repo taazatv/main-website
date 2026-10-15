@@ -25,7 +25,7 @@ export default function CategoryPage({ slug }: { slug: string }) {
         </div>
         <div className="seg">
           {[t.sortLatest, t.sortRead, t.sortVideo].map((label, i) => (
-            <button key={label} className={`seg-opt ${sort === i ? "on" : ""}`} onClick={() => setSort(i)}>{label}</button>
+            <button key={label} className={`seg-opt ${sort === i ? "on" : ""}`} aria-pressed={sort === i} onClick={() => setSort(i)}>{label}</button>
           ))}
         </div>
       </div>

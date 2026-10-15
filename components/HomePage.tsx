@@ -84,7 +84,7 @@ export default function HomePage() {
         </div>
         <div className="st-tabs">
           {STATES.map((s) => (
-            <button key={s} className={`st-tab ${stateName === s ? "on" : ""}`} onClick={() => setStateName(s)}>
+            <button key={s} className={`st-tab ${stateName === s ? "on" : ""}`} aria-pressed={stateName === s} onClick={() => setStateName(s)}>
               {lang === "hi" ? STATE_HI[s] : s}
             </button>
           ))}

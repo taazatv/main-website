@@ -20,7 +20,7 @@ export default function VideoPage() {
         </div>
         <div className="seg">
           {[t.tabShorts, t.tabBulletins, t.tabDebates].map((label, i) => (
-            <button key={label} className={`seg-opt ${tab === i ? "on" : ""}`} onClick={() => setTab(i)}>{label}</button>
+            <button key={label} className={`seg-opt ${tab === i ? "on" : ""}`} aria-pressed={tab === i} onClick={() => setTab(i)}>{label}</button>
           ))}
         </div>
       </div>

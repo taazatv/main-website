@@ -160,7 +160,7 @@ export default function ArticlePage({ slug }: { slug: string }) {
               ))
             )}
             <div className="cm-form">
-              <textarea className="input" value={draft} onChange={(e) => setDraft(e.target.value)} placeholder={L.placeholder} rows={3} />
+              <textarea className="input" aria-label={L.placeholder} value={draft} onChange={(e) => setDraft(e.target.value)} placeholder={L.placeholder} rows={3} />
               <button className="btn btn-primary" onClick={postComment} disabled={!draft.trim()}>{L.post}</button>
             </div>
           </section>

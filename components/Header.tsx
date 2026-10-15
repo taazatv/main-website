@@ -4,75 +4,70 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { useApp } from "./AppProvider";
+import AppLinks from "./AppLinks";
 import { NAV, SOCIALS, STATE_HI, type NavLeaf } from "@/lib/data";
 
 type Menu = { top: number; left: number; items: NavLeaf[] } | null;
+
+const MOBILE_TOPICS = [
+  { label: "Home", hi: "होम", href: "/" },
+  { label: "National", hi: "देश", href: "/category/national" },
+  { label: "State", hi: "राज्य", href: "/category/state" },
+  { label: "Live TV", hi: "लाइव TV", href: "/live-tv" },
+  { label: "Sports", hi: "खेल", href: "/category/sports" },
+  { label: "World", hi: "दुनिया", href: "/category/international-news" },
+  { label: "Video", hi: "वीडियो", href: "/video" },
+];
 
 export default function Header() {
   const { t, lang, setLang, theme, toggleTheme, stateName, setStateModalOpen } = useApp();
   const pathname = usePathname();
   const router = useRouter();
   const [menu, setMenu] = useState<Menu>(null);
-  const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const mobileToggle = useRef<HTMLButtonElement>(null);
+  const menuTrigger = useRef<HTMLElement | null>(null);
+  const dropdown = useRef<HTMLDivElement>(null);
   const hindi = lang === "hi";
 
-  useEffect(() => setMenu(null), [pathname]);
+  useEffect(() => { setMenu(null); setMobileOpen(false); }, [pathname]);
+  useEffect(() => {
+    const query = window.matchMedia("(max-width: 1100px)");
+    const reset = () => { setMenu(null); setMobileOpen(false); };
+    query.addEventListener("change", reset);
+    return () => query.removeEventListener("change", reset);
+  }, []);
   useEffect(() => {
     if (!menu) return;
+    dropdown.current?.querySelector<HTMLAnchorElement>("a")?.focus();
     const shut = (e: Event) => {
       if (e.type === "pointerdown" && (e.target as Element).closest(".dropdown, .nav-item.group")) return;
       setMenu(null);
     };
     window.addEventListener("pointerdown", shut);
     window.addEventListener("scroll", shut, { passive: true });
+    window.addEventListener("resize", shut);
     return () => {
       window.removeEventListener("pointerdown", shut);
       window.removeEventListener("scroll", shut);
+      window.removeEventListener("resize", shut);
     };
   }, [menu]);
 
   const isOn = (href: string) => (href === "/" ? pathname === "/" : pathname === href);
-  const keep = () => { if (closeTimer.current) clearTimeout(closeTimer.current); };
-  const close = () => { keep(); closeTimer.current = setTimeout(() => setMenu(null), 120); };
   const open = (el: HTMLElement, items: NavLeaf[]) => {
-    keep();
     const r = el.getBoundingClientRect();
-    setMenu({ top: r.bottom + 8, left: r.left, items });
+    menuTrigger.current = el;
+    setMenu({ top: r.bottom + 8, left: Math.max(8, Math.min(r.left, window.innerWidth - 248)), items });
   };
 
   return (
     <>
       {/* logo row */}
       <div className="hdr">
-        <div className="hdr-left">
-          <a href="#" className="chip" aria-label="Get it on Google Play">
-            <span className="chip-ic">
-              <svg viewBox="0 0 512 512" width="16" height="16" aria-hidden="true">
-                <path fill="#34a853" d="M325 256 92 489c-6 5-14 4-19-2l186-186z" />
-                <path fill="#4285f4" d="M73 23c-6 5-9 13-9 22v422c0 9 3 17 9 22l186-211z" />
-                <path fill="#fbbc04" d="M325 256l79-79 7 4c25 14 25 36 0 50l-7 4z" />
-                <path fill="#ea4335" d="M325 256L259 190 73 23c5-5 14-6 21-2l311 176z" />
-              </svg>
-            </span>
-            <span className="chip-txt">
-              <span className="chip-sm">{t.getItOn}</span>
-              <span className="chip-lg">Google Play</span>
-            </span>
-          </a>
-          <a href="#" className="chip" aria-label="Download on the App Store">
-            <span className="chip-ic">
-              <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true">
-                <path d="M16.4 12.7c0-2 1.6-3 1.7-3.1-.9-1.4-2.4-1.5-2.9-1.6-1.2-.1-2.4.7-3 .7s-1.6-.7-2.6-.7c-1.3 0-2.6.8-3.3 2-1.4 2.4-.4 6 1 8 .7 1 1.5 2.1 2.5 2 1-.1 1.4-.6 2.6-.6s1.5.6 2.6.6c1.1 0 1.8-1 2.4-2 .8-1.1 1.1-2.2 1.1-2.3 0 0-2.1-.8-2.1-3zM14.6 6.3c.5-.7.9-1.6.8-2.6-.8 0-1.8.5-2.4 1.2-.5.6-1 1.6-.8 2.5.9.1 1.8-.4 2.4-1.1z" />
-              </svg>
-            </span>
-            <span className="chip-txt">
-              <span className="chip-sm">{t.downloadOnThe}</span>
-              <span className="chip-lg">App Store</span>
-            </span>
-          </a>
-        </div>
+        <AppLinks className="hdr-left" />
 
-        <Link href="/" aria-label="Taaza TV home" style={{ justifySelf: "center" }}>
+        <Link href="/" className="brand-link" aria-label="Taaza TV home" style={{ justifySelf: "center" }}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img className="m-logo" src="/taaza/logo.png" alt="Taaza TV" />
         </Link>
@@ -100,16 +95,27 @@ export default function Header() {
       </div>
 
       {/* dark nav strip */}
-      <div className="navbar">
-        <nav className="navstrip">
+      <div className="navbar" onKeyDown={(e) => {
+        if (e.key === "Escape" && mobileOpen) { setMobileOpen(false); mobileToggle.current?.focus(); }
+      }}>
+        <nav className="mobile-topics" aria-label={hindi ? "मुख्य खबरें" : "News sections"}>
+          {MOBILE_TOPICS.map((item) => <Link key={item.href} href={item.href} className={`topic-link ${item.href === "/live-tv" ? "topic-live" : ""}`} aria-current={isOn(item.href) ? "page" : undefined} onClick={() => setMobileOpen(false)}>
+            {item.href === "/live-tv" && <span className="live-dot" aria-hidden="true" />}{hindi ? item.hi : item.label}
+          </Link>)}
+          <button ref={mobileToggle} className="mobile-toggle topic-link" aria-expanded={mobileOpen} aria-controls="mobile-navigation" onClick={(e) => { e.currentTarget.focus(); setMobileOpen((v) => !v); }}>
+            {hindi ? (mobileOpen ? "बंद करें" : "और") : (mobileOpen ? "Close" : "More")}<span aria-hidden="true">{mobileOpen ? "−" : "+"}</span>
+          </button>
+        </nav>
+        <nav className="navstrip" aria-label={hindi ? "मुख्य नेविगेशन" : "Main navigation"}>
           {NAV.map((n) =>
             "group" in n ? (
               <button
                 key={n.label}
                 className={`nav-item group ${n.group.some((g) => isOn(g.href)) ? "on" : ""}`}
-                onMouseEnter={(e) => open(e.currentTarget, n.group)}
-                onMouseLeave={close}
-                onClick={(e) => (menu ? setMenu(null) : open(e.currentTarget, n.group))}
+                aria-expanded={menu?.items === n.group}
+                aria-controls={menu?.items === n.group ? "navigation-dropdown" : undefined}
+                onClick={(e) => (menu?.items === n.group ? setMenu(null) : open(e.currentTarget, n.group))}
+                onKeyDown={(e) => { if (e.key === "ArrowDown") { e.preventDefault(); open(e.currentTarget, n.group); } }}
               >
                 {hindi ? n.hi : n.label}
                 <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -117,7 +123,7 @@ export default function Header() {
                 </svg>
               </button>
             ) : (
-              <Link key={n.label} href={n.href} className={`nav-item ${isOn(n.href) ? "on" : ""}`} onMouseEnter={close}>
+              <Link key={n.label} href={n.href} className={`nav-item ${isOn(n.href) ? "on" : ""}`} aria-current={isOn(n.href) ? "page" : undefined}>
                 {(n.label === "Premium" || n.label === "Live TV") && <span className="nav-flag" />}
                 {hindi ? n.hi : n.label}
               </Link>
@@ -127,8 +133,8 @@ export default function Header() {
         <span className="nav-div" />
         <div className="nav-tools">
           <div className="lang-dark">
-            <button className={lang === "en" ? "on" : ""} onClick={() => setLang("en")} title="English">EN</button>
-            <button className={`hi ${lang === "hi" ? "on" : ""}`} onClick={() => setLang("hi")} title="Hindi">हिं</button>
+            <button className={lang === "en" ? "on" : ""} aria-pressed={lang === "en"} onClick={() => setLang("en")} title="English">EN</button>
+            <button className={`hi ${lang === "hi" ? "on" : ""}`} aria-pressed={lang === "hi"} onClick={() => setLang("hi")} title="Hindi">हिं</button>
           </div>
           <button className="round-dark" onClick={toggleTheme} title={theme === "dark" ? "Switch to light theme" : "Switch to dark theme"}>
             {theme === "dark" ? (
@@ -143,17 +149,33 @@ export default function Header() {
             )}
           </button>
         </div>
-        <button className="edition" onClick={() => { setMenu(null); setStateModalOpen(true); }} title={hindi ? STATE_HI[stateName] : stateName}>
+        <button className="edition" aria-haspopup="dialog" onClick={(e) => { e.currentTarget.focus(); setMenu(null); setStateModalOpen(true); }} title={hindi ? STATE_HI[stateName] : stateName}>
           <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
             <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z" />
             <circle cx="12" cy="10" r="3" />
           </svg>
           <span>{hindi ? STATE_HI[stateName] : stateName}</span>
         </button>
+        <nav id="mobile-navigation" className="mobile-navigation" hidden={!mobileOpen} aria-label={hindi ? "मोबाइल नेविगेशन" : "Mobile navigation"}>
+          {NAV.map((n) => "group" in n ? (
+            <details key={n.label}>
+              <summary>{hindi ? n.hi : n.label}</summary>
+              {n.group.map((item) => <Link key={item.label} href={item.href} aria-current={isOn(item.href) ? "page" : undefined} onClick={() => { setMobileOpen(false); mobileToggle.current?.focus(); }}>{hindi ? item.hi : item.label}</Link>)}
+            </details>
+          ) : (
+            <Link key={n.label} href={n.href} aria-current={isOn(n.href) ? "page" : undefined} onClick={() => { setMobileOpen(false); mobileToggle.current?.focus(); }}>{hindi ? n.hi : n.label}</Link>
+          ))}
+        </nav>
       </div>
 
       {menu && (
-        <div className="dropdown" style={{ top: menu.top, left: menu.left }} onMouseEnter={keep} onMouseLeave={close}>
+        <div ref={dropdown} id="navigation-dropdown" className="dropdown" style={{ top: menu.top, left: menu.left }} onBlur={(e) => {
+          // WebKit can blur a tapped link with no next focus target before its click fires.
+          // Outside pointer presses are handled separately; preserve that pending click.
+          if (e.relatedTarget && !e.currentTarget.contains(e.relatedTarget)) setMenu(null);
+        }} onKeyDown={(e) => {
+          if (e.key === "Escape") { setMenu(null); menuTrigger.current?.focus(); }
+        }}>
           {menu.items.map((it) => (
             <a key={it.label} href={it.href} onClick={(e) => { e.preventDefault(); setMenu(null); router.push(it.href); }}>
               {hindi ? it.hi : it.label}
@@ -165,7 +187,7 @@ export default function Header() {
       {/* breaking ticker */}
       <div className="ticker">
         <div className="ticker-tag">{t.breaking}</div>
-        <div className="ticker-track">
+        <div className="ticker-track" tabIndex={0} aria-label={t.breaking}>
           <div className="ticker-run" key={lang}>
             <span>{t.ticker}</span>
             <span aria-hidden="true">{t.ticker}</span>
