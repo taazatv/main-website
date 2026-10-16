@@ -299,15 +299,34 @@ export default function HomePage({ news }: { news?: HomeNews }) {
       {/* ---------- app promo (laptop only; phones get it in the footer) ---------- */}
       <div className="promo-wrap">
         <div className="promo-app on-dark">
-          <div>
+          <div className="pa-copy">
             <div className="k">{t.appKicker}</div>
             <div className="tt">{t.appTitle}</div>
+            <p className="sub">{t.appSub}</p>
             <div className="btns">
-              <a className="btn btn-ghost" href={APP_LINKS.playStore} target="_blank" rel="noopener noreferrer">Play Store</a>
-              <a className="btn btn-ghost" href={APP_LINKS.appStore} target="_blank" rel="noopener noreferrer">App Store</a>
+              <a className="store" href={APP_LINKS.playStore} target="_blank" rel="noopener noreferrer" aria-label="Get it on Google Play">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#00d7fe" d="M3.6 1.8 13.4 12l-9.8 10.2c-.4-.2-.6-.6-.6-1.1V2.9c0-.5.2-.9.6-1.1Z"/><path fill="#ffce00" d="m16.8 8.6 3.4 1.9c1 .6 1 2.4 0 3l-3.4 1.9L13.4 12l3.4-3.4Z"/><path fill="#ff3a44" d="M13.4 12 3.6 22.2c.3.2.8.2 1.3 0l11.9-6.8-3.4-3.4Z"/><path fill="#00f076" d="M3.6 1.8c.3-.2.8-.2 1.3 0l11.9 6.8-3.4 3.4L3.6 1.8Z"/></svg>
+                <span><small>{t.getItOn}</small>Google Play</span>
+              </a>
+              <a className="store" href={APP_LINKS.appStore} target="_blank" rel="noopener noreferrer" aria-label="Download on the App Store">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M16.4 12.7c0-2.4 2-3.6 2.1-3.7-1.2-1.7-3-1.9-3.6-2-1.5-.2-3 .9-3.8.9-.8 0-2-.9-3.3-.9-1.7 0-3.3 1-4.2 2.5-1.8 3.1-.5 7.7 1.3 10.2.9 1.2 1.9 2.6 3.2 2.6 1.3-.1 1.8-.8 3.3-.8 1.6 0 2 .8 3.4.8 1.4 0 2.3-1.3 3.1-2.5 1-1.4 1.4-2.8 1.4-2.9 0 0-2.8-1-2.9-4.2ZM13.9 5.3c.7-.8 1.2-2 1-3.1-1 0-2.2.7-2.9 1.5-.6.7-1.2 1.9-1 3 1.1.1 2.2-.6 2.9-1.4Z"/></svg>
+                <span><small>{t.downloadOnThe}</small>App Store</span>
+              </a>
             </div>
           </div>
-          <Ph src="/taaza/app.jpg" className="phone" />
+          <ul className="pa-feats">
+            {t.appFeatures.map((f) => <li key={f}>{f}</li>)}
+          </ul>
+          <div className="pa-phone" aria-hidden="true">
+            <div className="notch" />
+            <div className="scr">
+              <img src="/taaza/logo.png" alt="" className="logo" />
+              <div className="live"><span className="dot" />LIVE</div>
+              <div className="ln w90" /><div className="ln w70" />
+              <div className="card" /><div className="ln w80" /><div className="ln w60" />
+              <div className="card sm" />
+            </div>
+          </div>
         </div>
       </div>
     </div>

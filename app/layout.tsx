@@ -25,7 +25,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const headlines = breaking.slice(0, 10).map(({ title, href }) => ({ title, href }));
   return (
     <html lang="en" data-theme="light" className={archivo.variable} suppressHydrationWarning>
-      <body>
+      {/* browser extensions (e.g. Grammarly) add attributes to <body> before React hydrates */}
+      <body suppressHydrationWarning>
         <AppProvider>
           <div className="m-frame">
             <Header headlines={headlines} ad={ad} />
