@@ -4,16 +4,19 @@ export type StateName = "West Bengal" | "Bihar" | "Jharkhand" | "Uttar Pradesh";
 export const STATES: StateName[] = ["West Bengal", "Bihar", "Jharkhand", "Uttar Pradesh"];
 export const STATE_SHORT: Record<StateName, string> = { "West Bengal": "WB", Bihar: "BR", Jharkhand: "JH", "Uttar Pradesh": "UP" };
 export const STATE_HI: Record<StateName, string> = { "West Bengal": "पश्चिम बंगाल", Bihar: "बिहार", Jharkhand: "झारखंड", "Uttar Pradesh": "उत्तर प्रदेश" };
+/** Category slug of each state's own news page ("/category/west-bengal"). */
+export const STATE_SLUG: Record<StateName, string> = { "West Bengal": "west-bengal", Bihar: "bihar", Jharkhand: "jharkhand", "Uttar Pradesh": "uttar-pradesh" };
+export const stateForSlug = (slug: string) => STATES.find((s) => STATE_SLUG[s] === slug);
 
 const pic = (seed: string, i: number, dims: string) => `https://picsum.photos/seed/${seed}${i + 1}/${dims}`;
 
 /* ---------------- UI dictionary ---------------- */
 export const en = {
   date: "Tuesday, 1 September 2026", yourState: "Your state:", notifications: "Notifications",
-  saved: "Saved News", citizen: "Citizen Journalist", signIn: "SIGN IN", follow: "FOLLOW US", search: "Search news…",
+  saved: "Saved News", citizen: "Citizen Journalist", signIn: "Sign in", follow: "FOLLOW US", search: "Search news…",
   liveTv: "LIVE TV", tagline: "News in your language, from your state", breaking: "BREAKING NEWS",
   topStory: "TOP STORY", latest: "Latest Updates",
-  viewMore: "View More", watchLive: "WATCH LIVE", mostWatched: "MOST WATCHED",
+  viewMore: "View More", watchLive: "WATCH LIVE",
   stateNews: "State News", fromYourState: "FROM YOUR STATE", nationalNews: "NATIONAL NEWS",
   worldNews: "INTERNATIONAL NEWS", videoNews: "VIDEO NEWS", entNews: "ENTERTAINMENT NEWS",
   sportsNews: "SPORTS NEWS", healthNews: "HEALTH NEWS", premiumNews: "PREMIUM NEWS",
@@ -30,7 +33,7 @@ export const en = {
   liveUpdates: "Live Updates", alsoRead: "Also Read", atAGlance: "AT A GLANCE",
   alertsTitle: "Taaza TV Alerts", alertsBody: "Get breaking news on WhatsApp, the moment it happens.",
   joinNow: "Join now", onAir: "ON AIR NOW", schedule: "Today's Schedule",
-  videoHub: "Videos & Shorts", tabShorts: "Shorts", tabBulletins: "Videos", tabDebates: "Live",
+  videoHub: "Videos & Reels", tabShorts: "Reels", tabBulletins: "Videos", tabDebates: "Live",
   footerTagline: "A national Hindi and English news channel from eastern India. News in your language, from your state.",
   popularCats: "POPULAR CATEGORIES", more: "MORE", quickLinks: "QUICK LINKS", group: "GROUP OF COMPANIES",
   leadKicker: "NATIONAL · UTTAR PRADESH • 12 MIN AGO",
@@ -52,7 +55,7 @@ export const hi: Dict = {
   saved: "सेव्ड न्यूज़", citizen: "सिटिजन जर्नलिस्ट", signIn: "साइन इन", follow: "फॉलो करें", search: "खबर खोजें…",
   liveTv: "लाइव TV", tagline: "आपकी भाषा में, आपके राज्य की खबर", breaking: "ब्रेकिंग न्यूज़",
   topStory: "बड़ी खबर", latest: "ताज़ा अपडेट",
-  viewMore: "और देखें", watchLive: "लाइव देखें", mostWatched: "सबसे ज़्यादा देखे गए",
+  viewMore: "और देखें", watchLive: "लाइव देखें",
   stateNews: "राज्य की खबरें", fromYourState: "आपके राज्य से", nationalNews: "देश",
   worldNews: "दुनिया", videoNews: "वीडियो", entNews: "मनोरंजन",
   sportsNews: "खेल", healthNews: "हेल्थ", premiumNews: "प्रीमियम",
@@ -69,7 +72,7 @@ export const hi: Dict = {
   liveUpdates: "लाइव अपडेट्स", alsoRead: "ये भी पढ़ें", atAGlance: "एक नज़र में",
   alertsTitle: "Taaza TV अलर्ट", alertsBody: "ब्रेकिंग न्यूज़ सीधे WhatsApp पर पाएं।",
   joinNow: "जॉइन करें", onAir: "अभी चल रहा है", schedule: "आज का शेड्यूल",
-  videoHub: "वीडियो और शॉर्ट्स", tabShorts: "शॉर्ट्स", tabBulletins: "वीडियो", tabDebates: "लाइव",
+  videoHub: "वीडियो और रील्स", tabShorts: "रील्स", tabBulletins: "वीडियो", tabDebates: "लाइव",
   footerTagline: "पूर्वी भारत से हिंदी और अंग्रेज़ी न्यूज़ चैनल। आपकी भाषा में, आपके राज्य की खबर।",
   popularCats: "लोकप्रिय सेक्शन", more: "और", quickLinks: "क्विक लिंक", group: "ग्रुप ऑफ कंपनीज़",
   leadKicker: "देश · उत्तर प्रदेश • 12 मिनट पहले",
@@ -93,7 +96,6 @@ export type NavItem = NavLeaf | { label: string; hi: string; group: NavLeaf[] };
 
 export const CATEGORIES: Record<string, { en: string; hi: string }> = {
   "medha-samman-2026": { en: "Medha Samman 2026", hi: "मेधा सम्मान 2026" },
-  "election-2026": { en: "Election 2026", hi: "चुनाव 2026" },
   premium: { en: "Premium", hi: "प्रीमियम" },
   national: { en: "National", hi: "देश" },
   entertainment: { en: "Entertainment", hi: "मनोरंजन" },
@@ -101,29 +103,32 @@ export const CATEGORIES: Record<string, { en: string; hi: string }> = {
   "international-news": { en: "International News", hi: "दुनिया" },
   sports: { en: "Sports", hi: "खेल" },
   health: { en: "Health", hi: "हेल्थ" },
+  ...Object.fromEntries(STATES.map((s) => [STATE_SLUG[s], { en: s, hi: STATE_HI[s] }])),
 };
 
 export const NAV: NavItem[] = [
   { label: "Home", hi: "होम", href: "/" },
   {
     label: "Events", hi: "इवेंट्स", group: [
-      { label: "Medha Samman 2026", hi: "मेधा सम्मान 2026", href: "/category/medha-samman-2026" },
-      { label: "Taaza Dandiya 2026", hi: "ताज़ा डांडिया 2026", href: "/category/medha-samman-2026" },
+      { label: "Youngotsav", hi: "यंगोत्सव", href: "/category/medha-samman-2026" },
+      { label: "Medha Samman", hi: "मेधा सम्मान", href: "/category/medha-samman-2026" },
+      { label: "Kwizdom", hi: "क्विज़डम", href: "/category/medha-samman-2026" },
+      { label: "Taaza Dandiya", hi: "ताज़ा डांडिया", href: "/category/medha-samman-2026" },
+      { label: "Winter Carnival", hi: "विंटर कार्निवल", href: "/category/medha-samman-2026" },
     ],
   },
-  { label: "Election", hi: "चुनाव", href: "/category/election-2026" },
-  { label: "Premium", hi: "प्रीमियम", href: "/category/premium" },
+  { label: "State", hi: "राज्य", group: STATES.map((s) => ({ label: s, hi: STATE_HI[s], href: `/category/${STATE_SLUG[s]}` })) },
   { label: "National", hi: "देश", href: "/category/national" },
-  { label: "State", hi: "राज्य", href: "/category/state" },
+  { label: "International", hi: "दुनिया", href: "/category/international-news" },
+  { label: "Sports", hi: "खेल", href: "/category/sports" },
+  { label: "Video", hi: "वीडियो", href: "/video" },
+  { label: "Premium", hi: "प्रीमियम", href: "/category/premium" },
   {
     label: "More", hi: "और", group: [
       { label: "Entertainment", hi: "मनोरंजन", href: "/category/entertainment" },
-      { label: "Sports", hi: "खेल", href: "/category/sports" },
       { label: "Health", hi: "हेल्थ", href: "/category/health" },
-      { label: "World", hi: "दुनिया", href: "/category/international-news" },
     ],
   },
-  { label: "Video", hi: "वीडियो", href: "/video" },
   { label: "Live TV", hi: "लाइव TV", href: "/live-tv" },
 ];
 
@@ -235,7 +240,6 @@ export const leadsEn: Record<string, { title: string; desc: string }> = {
   Entertainment: { title: "New release tops the box office with ₹42 crore on opening day", desc: "Multiplex occupancy stood at 78%. Trade analysts have revised weekend projections upward." },
   Health: { title: "India approves first dengue vaccine for the 4–60 age group", desc: "The rollout begins in government hospitals across six states in the first phase." },
   Premium: { title: "Project UDAAN: inside a college programme reshaping rural women's employment", desc: "A six-month reporting project across four districts. Members only." },
-  "Election 2026": { title: "Poll panel announces phased schedule; counting set for the last week of April", desc: "Seat-wise notifications follow next week. The model code of conduct is in force." },
   "Medha Samman 2026": { title: "Medha Samman 2026: nominations open for eastern India's student achievers", desc: "Entries close on 30 September. Winners are felicitated at a ceremony in Kolkata." },
 };
 export const leadsHi: Record<string, { title: string; desc: string }> = {
@@ -246,7 +250,6 @@ export const leadsHi: Record<string, { title: string; desc: string }> = {
   Entertainment: { title: "नई रिलीज़ ने पहले दिन 42 करोड़ के साथ बॉक्स ऑफिस पर कब्ज़ा किया", desc: "मल्टीप्लेक्स ऑक्यूपेंसी 78% रही। ट्रेड एनालिस्ट्स ने वीकेंड का अनुमान बढ़ाया।" },
   Health: { title: "भारत ने 4 से 60 उम्र वर्ग के लिए पहली डेंगू वैक्सीन को मंजूरी दी", desc: "पहले चरण में छह राज्यों के सरकारी अस्पतालों में रोलआउट शुरू होगा।" },
   Premium: { title: "प्रोजेक्ट उड़ान: ग्रामीण महिलाओं के रोज़गार को बदल रहे कॉलेज प्रोग्राम की कहानी", desc: "चार जिलों में छह महीने की रिपोर्टिंग। सिर्फ़ मेंबर्स के लिए।" },
-  "Election 2026": { title: "चुनाव आयोग ने चरणबद्ध कार्यक्रम घोषित किया; अप्रैल के आखिरी हफ्ते मतगणना", desc: "सीटवार अधिसूचना अगले हफ्ते। आदर्श आचार संहिता लागू है।" },
   "Medha Samman 2026": { title: "मेधा सम्मान 2026: पूर्वी भारत के छात्र प्रतिभाओं के लिए नामांकन शुरू", desc: "प्रवेश 30 सितंबर तक। विजेताओं को कोलकाता में सम्मानित किया जाएगा।" },
 };
 export const categoryLead = (lang: Lang, cat: string) =>
@@ -276,7 +279,7 @@ export function content(lang: Lang) {
         { n: "6", title: "बारामती के पास ट्रेनर विमान रनवे से फिसला, दोनों सुरक्षित", meta: "देश • 2 घंटे पहले" },
         { n: "7", title: "पड़ोसी देश ने पाइपलाइन से अतिरिक्त डीज़ल की मांग की", meta: "दुनिया • 2 घंटे पहले" },
       ],
-    ),
+    ).map((s, i) => ({ ...s, img: pic("ts", i, "400/300") })),
     topVideos: pick(
       ["Poll panel makes new appointments for Kolkata police", "Gas crisis hits community kitchens in the city", "Bengal gets a new governor: what changes", "Protests in central Kolkata: the full picture", "Temperatures climb across West Bengal"],
       ["कोलकाता पुलिस में चुनाव आयोग की नई तैनाती", "शहर की सामुदायिक रसोई पर गैस संकट का असर", "बंगाल को नया राज्यपाल: क्या बदलेगा", "मध्य कोलकाता में प्रदर्शन: पूरी तस्वीर", "पश्चिम बंगाल में चढ़ता तापमान"],
@@ -304,11 +307,15 @@ export function content(lang: Lang) {
         { title: "New release tops the box office with ₹42 crore on day one", meta: "Entertainment • 30 min ago" },
         { title: "Streaming platform announces four Bengali originals for the season", meta: "Entertainment • 1 hour ago" },
         { title: "Veteran playback singer honoured at the state music awards", meta: "Entertainment • 2 hours ago" },
+        { title: "Shooting wraps on the much-awaited period drama set in old Kolkata", meta: "Entertainment • 3 hours ago" },
+        { title: "Film festival line-up announced with twelve regional premieres", meta: "Entertainment • 4 hours ago" },
       ],
       [
         { title: "नई रिलीज़ ने पहले दिन 42 करोड़ के साथ बॉक्स ऑफिस पर कब्ज़ा किया", meta: "मनोरंजन • 30 मिनट पहले" },
         { title: "स्ट्रीमिंग प्लेटफॉर्म ने इस सीज़न चार बंगाली ओरिजिनल्स का ऐलान किया", meta: "मनोरंजन • 1 घंटा पहले" },
         { title: "राज्य संगीत पुरस्कारों में दिग्गज पार्श्व गायक सम्मानित", meta: "मनोरंजन • 2 घंटे पहले" },
+        { title: "पुराने कोलकाता पर बनी बहुप्रतीक्षित पीरियड ड्रामा की शूटिंग पूरी", meta: "मनोरंजन • 3 घंटे पहले" },
+        { title: "फिल्म महोत्सव की सूची जारी, बारह क्षेत्रीय फिल्मों का प्रीमियर", meta: "मनोरंजन • 4 घंटे पहले" },
       ],
     ).map((o, i) => ({ ...o, img: pic("ent", i, "600/450") })),
     sports: pick(
@@ -324,13 +331,13 @@ export function content(lang: Lang) {
       [
         { title: "Inside a college programme reshaping rural women's employment", meta: "Investigation • 8 min read" },
         { title: "Tea garden wages: what actually changed on the ground", meta: "Ground report • 11 min read" },
-        { title: "Election 2026: the seat maths, in data", meta: "Data • 6 min read" },
+        { title: "Kolkata's metro expansion, station by station, in data", meta: "Data • 6 min read" },
         { title: "Water lines of 12 city wards, ward by ward", meta: "Investigation • 9 min read" },
       ],
       [
         { title: "ग्रामीण महिलाओं के रोज़गार को बदल रहे कॉलेज प्रोग्राम की अंदरूनी कहानी", meta: "इन्वेस्टिगेशन • 8 मिनट रीड" },
         { title: "चाय बागान मज़दूरी: ज़मीन पर असल में क्या बदला", meta: "ग्राउंड रिपोर्ट • 11 मिनट रीड" },
-        { title: "चुनाव 2026: सीटों का गणित, आंकड़ों में", meta: "डेटा • 6 मिनट रीड" },
+        { title: "कोलकाता मेट्रो का विस्तार, स्टेशन दर स्टेशन, आंकड़ों में", meta: "डेटा • 6 मिनट रीड" },
         { title: "शहर के 12 वार्डों की पानी की लाइनें, वार्ड दर वार्ड", meta: "इन्वेस्टिगेशन • 9 मिनट रीड" },
       ],
     ).map((o, i) => ({ ...o, img: pic("prem", i, "600/450") })),
@@ -419,7 +426,7 @@ export function content(lang: Lang) {
       ["Storage licence rules: what the law actually requires", "Magisterial inquiry ordered, report due in 15 days", "Compensation announced for families of the deceased", "Four units in the cluster sealed pending inspection"],
       ["स्टोरेज लाइसेंस के नियम: कानून असल में क्या कहता है", "मजिस्ट्रेट जांच का आदेश, 15 दिन में रिपोर्ट", "मृतकों के परिजनों के लिए मुआवज़े का ऐलान", "क्लस्टर की चार यूनिट जांच पूरी होने तक सील"],
     ).map((title, i) => ({ title, img: pic("rel", i, "400/300") })),
-    channels: ["Taaza TV HD", "Taaza Bangla", "Taaza Sports", "Taaza Fast"].map((label, i) => ({ label, img: pic("chan", i, "600/340") })),
+    channels: ["Taaza TV HD", "Taaza Bangla", "Taaza Sports", "Taaza Fast"].map((label) => ({ label })),
     schedule: pick(
       [
         { time: "07:00", show: "Morning Headlines", host: "Priya Singh" },

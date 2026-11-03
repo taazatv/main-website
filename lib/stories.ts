@@ -34,7 +34,6 @@ const CAT: Record<string, { name: L; slug: string; place: L }> = {
   Health: { name: { en: "Health", hi: "हेल्थ" }, slug: "health", place: { en: "Kolkata", hi: "कोलकाता" } },
   Premium: { name: { en: "Premium", hi: "प्रीमियम" }, slug: "premium", place: { en: "Kolkata", hi: "कोलकाता" } },
   Video: { name: { en: "Video", hi: "वीडियो" }, slug: "", place: { en: "Kolkata", hi: "कोलकाता" } },
-  "Election 2026": { name: { en: "Election 2026", hi: "चुनाव 2026" }, slug: "election-2026", place: { en: "Kolkata", hi: "कोलकाता" } },
   "Medha Samman 2026": { name: { en: "Medha Samman 2026", hi: "मेधा सम्मान 2026" }, slug: "medha-samman-2026", place: { en: "Kolkata", hi: "कोलकाता" } },
 };
 const LEAD_CAT: Record<string, string> = { "International News": "International" };

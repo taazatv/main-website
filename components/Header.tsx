@@ -4,23 +4,28 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { useApp } from "./AppProvider";
+import { useAuth } from "./AuthProvider";
 import AppLinks from "./AppLinks";
 import { NAV, SOCIALS, STATE_HI, type NavLeaf } from "@/lib/data";
 
-type Menu = { top: number; left: number; items: NavLeaf[] } | null;
+/** `hover`: opened by the mouse passing over, so it closes when the mouse leaves and doesn't take focus. */
+type Menu = { top: number; left: number; items: NavLeaf[]; hover?: boolean } | null;
 
 const MOBILE_TOPICS = [
   { label: "Home", hi: "होम", href: "/" },
-  { label: "National", hi: "देश", href: "/category/national" },
   { label: "State", hi: "राज्य", href: "/category/state" },
-  { label: "Live TV", hi: "लाइव TV", href: "/live-tv" },
-  { label: "Sports", hi: "खेल", href: "/category/sports" },
+  { label: "National", hi: "देश", href: "/category/national" },
   { label: "World", hi: "दुनिया", href: "/category/international-news" },
+  { label: "Sports", hi: "खेल", href: "/category/sports" },
   { label: "Video", hi: "वीडियो", href: "/video" },
+  { label: "Premium", hi: "प्रीमियम", href: "/category/premium" },
 ];
+const PREMIUM = "/category/premium";
+const MOBILE_LIVE ={ label: "Live TV", hi: "लाइव TV", href: "/live-tv" };
 
 export default function Header({ headlines = [], ad }: { headlines?: { title: string; href: string }[]; ad?: { href: string; web: string; mobile: string } | null }) {
   const { t, lang, setLang, theme, toggleTheme, stateName, setStateModalOpen } = useApp();
+  const { user, askSignIn } = useAuth();
   const pathname = usePathname();
   const router = useRouter();
   const [menu, setMenu] = useState<Menu>(null);
@@ -28,6 +33,7 @@ export default function Header({ headlines = [], ad }: { headlines?: { title: st
   const mobileToggle = useRef<HTMLButtonElement>(null);
   const menuTrigger = useRef<HTMLElement | null>(null);
   const dropdown = useRef<HTMLDivElement>(null);
+  const closeTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
   const hindi = lang === "hi";
 
   useEffect(() => { setMenu(null); setMobileOpen(false); }, [pathname]);
@@ -39,7 +45,7 @@ export default function Header({ headlines = [], ad }: { headlines?: { title: st
   }, []);
   useEffect(() => {
     if (!menu) return;
-    dropdown.current?.querySelector<HTMLAnchorElement>("a")?.focus();
+    if (!menu.hover) dropdown.current?.querySelector<HTMLAnchorElement>("a")?.focus();
     const shut = (e: Event) => {
       if (e.type === "pointerdown" && (e.target as Element).closest(".dropdown, .nav-item.group")) return;
       setMenu(null);
@@ -55,11 +61,21 @@ export default function Header({ headlines = [], ad }: { headlines?: { title: st
   }, [menu]);
 
   const isOn = (href: string) => (href === "/" ? pathname === "/" : pathname === href);
-  const open = (el: HTMLElement, items: NavLeaf[]) => {
+  // signed-out readers get the sign-in popup instead of the Premium section; it opens after they sign in
+  const gate = (href: string, e: React.MouseEvent) => {
+    if (href !== PREMIUM || user) return;
+    e.preventDefault();
+    askSignIn(href);
+  };
+  const open = (el: HTMLElement, items: NavLeaf[], hover = false) => {
     const r = el.getBoundingClientRect();
     menuTrigger.current = el;
-    setMenu({ top: r.bottom + 8, left: Math.max(8, Math.min(r.left, window.innerWidth - 248)), items });
+    setMenu({ top: r.bottom + 8, left: Math.max(8, Math.min(r.left, window.innerWidth - 248)), items, hover });
   };
+  // mouse hover: open at once, close shortly after leaving so the pointer can cross the gap to the list
+  const keepOpen = () => clearTimeout(closeTimer.current);
+  const closeSoon = () => { keepOpen(); closeTimer.current = setTimeout(() => setMenu((m) => (m?.hover ? null : m)), 180); };
+  useEffect(() => keepOpen, []);
 
   return (
     <>
@@ -82,15 +98,15 @@ export default function Header({ headlines = [], ad }: { headlines?: { title: st
               </a>
             ))}
           </div>
-          <a href="#" className="chip signin">
+          <Link href="/login" className="chip signin" title={user ? user.email : undefined}>
             <span className="chip-ic">
               <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                 <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
                 <circle cx="12" cy="7" r="4" />
               </svg>
             </span>
-            <span className="chip-signin-txt">{t.signIn}</span>
-          </a>
+            <span className="chip-signin-txt">{user ? user.name : t.signIn}</span>
+          </Link>
         </div>
       </div>
 
@@ -99,12 +115,15 @@ export default function Header({ headlines = [], ad }: { headlines?: { title: st
         if (e.key === "Escape" && mobileOpen) { setMobileOpen(false); mobileToggle.current?.focus(); }
       }}>
         <nav className="mobile-topics" aria-label={hindi ? "मुख्य खबरें" : "News sections"}>
-          {MOBILE_TOPICS.map((item) => <Link key={item.href} href={item.href} className={`topic-link ${item.href === "/live-tv" ? "topic-live" : ""}`} aria-current={isOn(item.href) ? "page" : undefined} onClick={() => setMobileOpen(false)}>
-            {item.href === "/live-tv" && <span className="live-dot" aria-hidden="true" />}{hindi ? item.hi : item.label}
+          {MOBILE_TOPICS.map((item) => <Link key={item.href} href={item.href} className="topic-link" aria-current={isOn(item.href) ? "page" : undefined} onClick={(e) => { setMobileOpen(false); gate(item.href, e); }}>
+            {hindi ? item.hi : item.label}
           </Link>)}
           <button ref={mobileToggle} className="mobile-toggle topic-link" aria-expanded={mobileOpen} aria-controls="mobile-navigation" onClick={(e) => { e.currentTarget.focus(); setMobileOpen((v) => !v); }}>
             {hindi ? (mobileOpen ? "बंद करें" : "और") : (mobileOpen ? "Close" : "More")}<span aria-hidden="true">{mobileOpen ? "−" : "+"}</span>
           </button>
+          <Link href={MOBILE_LIVE.href} className="topic-link topic-live" aria-current={isOn(MOBILE_LIVE.href) ? "page" : undefined} onClick={() => setMobileOpen(false)}>
+            <span className="live-dot" aria-hidden="true" />{hindi ? MOBILE_LIVE.hi : MOBILE_LIVE.label}
+          </Link>
         </nav>
         <nav className="navstrip" aria-label={hindi ? "मुख्य नेविगेशन" : "Main navigation"}>
           {NAV.map((n) =>
@@ -114,7 +133,10 @@ export default function Header({ headlines = [], ad }: { headlines?: { title: st
                 className={`nav-item group ${n.group.some((g) => isOn(g.href)) ? "on" : ""}`}
                 aria-expanded={menu?.items === n.group}
                 aria-controls={menu?.items === n.group ? "navigation-dropdown" : undefined}
-                onClick={(e) => (menu?.items === n.group ? setMenu(null) : open(e.currentTarget, n.group))}
+                onPointerEnter={(e) => { if (e.pointerType === "mouse") { keepOpen(); if (menu?.items !== n.group) open(e.currentTarget, n.group, true); } }}
+                onPointerLeave={(e) => { if (e.pointerType === "mouse") closeSoon(); }}
+                // a click on a hover-opened list pins it open instead of closing it
+                onClick={(e) => (menu?.items === n.group ? setMenu(menu.hover ? { ...menu, hover: false } : null) : open(e.currentTarget, n.group))}
                 onKeyDown={(e) => { if (e.key === "ArrowDown") { e.preventDefault(); open(e.currentTarget, n.group); } }}
               >
                 {hindi ? n.hi : n.label}
@@ -123,7 +145,7 @@ export default function Header({ headlines = [], ad }: { headlines?: { title: st
                 </svg>
               </button>
             ) : (
-              <Link key={n.label} href={n.href} className={`nav-item ${isOn(n.href) ? "on" : ""}`} aria-current={isOn(n.href) ? "page" : undefined}>
+              <Link key={n.label} href={n.href} className={`nav-item ${isOn(n.href) ? "on" : ""}`} aria-current={isOn(n.href) ? "page" : undefined} onClick={(e) => gate(n.href, e)}>
                 {(n.label === "Premium" || n.label === "Live TV") && <span className="nav-flag" />}
                 {hindi ? n.hi : n.label}
               </Link>
@@ -163,13 +185,16 @@ export default function Header({ headlines = [], ad }: { headlines?: { title: st
               {n.group.map((item) => <Link key={item.label} href={item.href} aria-current={isOn(item.href) ? "page" : undefined} onClick={() => { setMobileOpen(false); mobileToggle.current?.focus(); }}>{hindi ? item.hi : item.label}</Link>)}
             </details>
           ) : (
-            <Link key={n.label} href={n.href} aria-current={isOn(n.href) ? "page" : undefined} onClick={() => { setMobileOpen(false); mobileToggle.current?.focus(); }}>{hindi ? n.hi : n.label}</Link>
+            <Link key={n.label} href={n.href} aria-current={isOn(n.href) ? "page" : undefined} onClick={(e) => { setMobileOpen(false); mobileToggle.current?.focus(); gate(n.href, e); }}>{hindi ? n.hi : n.label}</Link>
           ))}
         </nav>
       </div>
 
       {menu && (
-        <div ref={dropdown} id="navigation-dropdown" className="dropdown" style={{ top: menu.top, left: menu.left }} onBlur={(e) => {
+        <div ref={dropdown} id="navigation-dropdown" className="dropdown" style={{ top: menu.top, left: menu.left }}
+          onPointerEnter={(e) => { if (e.pointerType === "mouse") keepOpen(); }}
+          onPointerLeave={(e) => { if (e.pointerType === "mouse") closeSoon(); }}
+          onBlur={(e) => {
           // WebKit can blur a tapped link with no next focus target before its click fires.
           // Outside pointer presses are handled separately; preserve that pending click.
           if (e.relatedTarget && !e.currentTarget.contains(e.relatedTarget)) setMenu(null);

@@ -177,7 +177,6 @@ Category slugs map to old-site category names in `OLD_CATEGORY` (`lib/taaza.ts`)
 | `sports` | Sports |
 | `health` | Health |
 | `premium` | Premium |
-| `election-2026` | ELECTION 2026 |
 | `medha-samman-2026` | Medha Samman 2026 |
 
 ### Header banner and sports tiles
@@ -258,6 +257,9 @@ Set it in Vercel under **Project → Settings → Environment Variables**. Local
 
 Edit `lib/links.ts` for the live stream URL, app store links, contact email / phones / WhatsApp, group
 companies and legal links. Social profiles (`SOCIALS`) are in `lib/data.ts`.
+
+The Video page's **Reels** tab shows the Instagram reels listed in `REEL_LINKS` in `lib/instagram.ts`.
+To add one, copy its link on Instagram (Share → Copy link) and paste it at the top of that list.
 
 ## Deployment
 

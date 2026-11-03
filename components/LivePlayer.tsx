@@ -61,7 +61,6 @@ export default function LivePlayer({ compact = false }: { compact?: boolean }) {
         muted
         playsInline
         autoPlay
-        poster="/taaza/live.jpg"
         aria-label="Taaza TV live stream"
         onVolumeChange={(e) => setMuted(e.currentTarget.muted)}
       />

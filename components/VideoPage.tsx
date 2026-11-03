@@ -5,20 +5,26 @@ import { useState } from "react";
 import { useApp } from "./AppProvider";
 import { Ph } from "./ui";
 import VideoGrid from "./VideoGrid";
+import ReelGrid, { IgIcon } from "./ReelGrid";
 import { SOCIALS, content } from "@/lib/data";
 import { storyHref } from "@/lib/stories";
+import type { IgReel } from "@/lib/instagram";
 import type { YtVideo } from "@/lib/youtube";
 
-type Feeds = { shorts: YtVideo[]; videos: YtVideo[]; live: YtVideo[] };
+type Feeds = { reels: IgReel[]; videos: YtVideo[]; live: YtVideo[] };
 
 export default function VideoPage({ feeds }: { feeds?: Feeds }) {
   const { t, lang } = useApp();
   const [tab, setTab] = useState(0);
   const c = content(lang);
-  const lists = [feeds?.shorts ?? [], feeds?.videos ?? [], feeds?.live ?? []];
-  const current = lists[tab];
+  const H = lang === "hi";
+  const reels = feeds?.reels ?? [];
+  const lists = [feeds?.videos ?? [], feeds?.live ?? []];
+  const current = tab > 0 ? lists[tab - 1] : [];
   const youtube = SOCIALS.find((x) => x.name === "YouTube")?.href;
-  const hasAny = lists.some((l) => l.length > 0);
+  const instagram = SOCIALS.find((x) => x.name === "Instagram")?.href ?? "https://www.instagram.com/taazatvchannel/";
+  const igLabel = H ? "Instagram पर सभी रील्स देखें" : "See all Reels on Instagram";
+  const hasAny = reels.length > 0 || lists.some((l) => l.length > 0);
 
   return (
     <div>
@@ -33,10 +39,23 @@ export default function VideoPage({ feeds }: { feeds?: Feeds }) {
           ))}
         </div>
       </div>
-      {hasAny ? (
+      {tab === 0 ? (
+        reels.length > 0 ? (
+          <ReelGrid reels={reels} more={{ href: instagram, label: igLabel }} />
+        ) : (
+          // reels feed not configured or unreachable: send readers to the profile
+          <a href={instagram} target="_blank" rel="noopener noreferrer" className="lk ig-cta">
+            <span className="ig-cta-ic"><IgIcon size={34} /></span>
+            <span>
+              <span className="ig-cta-t">{H ? "हमारी रील्स Instagram पर देखें" : "Watch our Reels on Instagram"}</span>
+              <span className="ig-cta-s">@taazatvchannel</span>
+            </span>
+          </a>
+        )
+      ) : hasAny ? (
         current.length > 0
-          ? <VideoGrid key={tab} videos={current} className={tab === 0 ? "g8" : "g-wide"} itemClass={tab === 0 ? "vh" : "vwide"} more={youtube ? { href: youtube, label: lang === "hi" ? "YouTube चैनल पर सब देखें" : "See everything on our YouTube channel" } : undefined} />
-          : <p className="v-empty">{lang === "hi" ? "अभी यहां कोई वीडियो नहीं है।" : "No videos here yet."}</p>
+          ? <VideoGrid key={tab} videos={current} className="g-wide" itemClass="vwide" more={youtube ? { href: youtube, label: H ? "YouTube चैनल पर सब देखें" : "See everything on our YouTube channel" } : undefined} />
+          : <p className="v-empty">{H ? "अभी यहां कोई वीडियो नहीं है।" : "No videos here yet."}</p>
       ) : (
         <div className="g8">
           {c.shortsGrid.map((s) => (

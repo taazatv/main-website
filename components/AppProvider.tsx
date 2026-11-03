@@ -15,6 +15,8 @@ type AppCtx = {
   stateModalOpen: boolean;
   setStateModalOpen: (v: boolean) => void;
   t: ReturnType<typeof dict>;
+  /** True once the saved language / edition / theme have been read from storage. */
+  loaded: boolean;
 };
 
 const Ctx = createContext<AppCtx | null>(null);
@@ -61,6 +63,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
         toggleTheme: () => setTheme((p) => (p === "light" ? "dark" : "light")),
         stateModalOpen, setStateModalOpen,
         t: dict(lang),
+        loaded,
       }}
     >
       {children}

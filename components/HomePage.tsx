@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useApp } from "./AppProvider";
+import { useAuth } from "./AuthProvider";
 import { Ph, SecHead } from "./ui";
 import { SOCIALS, STATES, STATE_HI, content, edition } from "@/lib/data";
 import { storyHref } from "@/lib/stories";
@@ -28,21 +29,25 @@ function CardLink({ card, className, children }: { card: Card; className: string
     : <Link href={card.href} className={className}>{children}</Link>;
 }
 
-/** Title-only row on laptops; on phones it also shows the date above and a thumbnail on the right (app style). */
-function RowBody({ card }: { card: Card }) {
+/** Stock photos for stories that arrive without one, rotated so neighbouring cards differ. */
+const FALLBACK_IMGS = ["/taaza/state-lead.jpg", "/taaza/national-lead.jpg", "/taaza/category-lead.jpg", "/taaza/article-hero.jpg", "/taaza/lead.jpg"];
+const imgOf = (card: Card, i: number) => card.img ?? FALLBACK_IMGS[i % FALLBACK_IMGS.length];
+
+/** Photo on top, kicker / headline / date below. */
+function NewsCard({ card, i }: { card: Card; i: number }) {
   return (
-    <>
-      <span className="row-txt">
-        {card.meta && <span className="row-meta meta">{card.meta}</span>}
-        <span>{card.title}</span>
-      </span>
-      {card.img && <Ph src={card.img} className="app-thumb" />}
-    </>
+    <CardLink card={card} className="lk card">
+      <Ph src={imgOf(card, i)} className="ar-16-10" />
+      {card.kicker && <div className="kick">{card.kicker}</div>}
+      <div className="tt hv-t">{card.title}</div>
+      {card.meta && <div className="meta">{card.meta}</div>}
+    </CardLink>
   );
 }
 
 export default function HomePage({ news }: { news?: HomeNews }) {
   const { t, lang, stateName, setStateName } = useApp();
+  const { user } = useAuth();
   const c = content(lang);
   const sd = edition(lang, stateName);
   const onAir = useOnAir(c.schedule);
@@ -52,11 +57,11 @@ export default function HomePage({ news }: { news?: HomeNews }) {
   const heroPool = withImg(breaking);
   const lead: Card = heroPool[0] ?? { key: "lead", title: t.leadTitle, href: storyHref(t.leadTitle), img: "/taaza/lead.jpg", meta: t.leadKicker };
   const rest = breaking.filter((x) => x.key !== lead.key);
-  const subs = pick(rest.slice(0, 2), 2, () => [
+  const subs = pick(rest.slice(0, 6), 2, () => [
     { key: "subA", title: t.subATitle, href: storyHref(t.subATitle), kicker: t.subA, meta: t.subAMeta },
     { key: "subB", title: t.subBTitle, href: storyHref(t.subBTitle), kicker: t.subB, meta: t.subBMeta },
   ]);
-  const latest = pick(rest.slice(2, 9), 4, () => sample(c.topStories));
+  const latest = pick(rest.slice(6, 11), 3, () => sample(c.topStories).slice(0, 5));
 
 
   // ---- state edition ----
@@ -65,90 +70,72 @@ export default function HomePage({ news }: { news?: HomeNews }) {
   const stateList = pick(stateCards.filter((x) => x.key !== stateLead.key).slice(0, 6), 3, () => sample(sd.list.map((title) => ({ title }))));
 
   // ---- category bands ----
-  const nat = real(news?.national);
-  const natLead: Card = withImg(nat)[0] ?? { key: "nat", title: t.natLead, href: storyHref(t.natLead), img: "/taaza/national-lead.jpg" };
-  const natRows = pick(nat.filter((x) => x.key !== natLead.key).slice(0, 4), 2, () => sample(c.national.map((title) => ({ title }))));
-  const world = pick(withImg(real(news?.world)).slice(0, 4), 2, () => sample(c.worldCards));
-  const ent = pick(withImg(real(news?.entertainment)).slice(0, 3), 2, () => sample(c.entertainment));
-  const sports = pick(withImg(real(news?.sports)).slice(0, 4), 2, () => sample(c.sports));
-  const health = pick(withImg(real(news?.health)).slice(0, 4), 2, () => sample(c.health));
-  const premium = pick(withImg(real(news?.premium)).slice(0, 4), 2, () => sample(c.premium));
-
-  // ---- most watched: video stories, else other recent stories with pictures not shown above ----
-  const shown = new Set([lead, ...subs, ...latest, stateLead, ...stateList, natLead, ...natRows, ...world].map((x) => x.key));
-  const extra = withImg([...real(news?.videoStories), ...rest, ...nat, ...real(news?.world), ...real(news?.entertainment), ...real(news?.sports)])
-    .filter((x, i, all) => !shown.has(x.key) && all.findIndex((y) => y.key === x.key) === i);
-  const watched = pick(extra.slice(0, 5), 3, () => sample(c.topVideos));
+  const national = pick(real(news?.national).slice(0, 8), 2, () =>
+    sample([{ title: t.natLead, img: "/taaza/national-lead.jpg" }, ...c.national.map((title) => ({ title }))]));
+  // taazatv.com files some world stories under National too; don't show them twice
+  const natKeys = new Set(national.map((x) => x.key));
+  const world = pick(withImg(real(news?.world)).filter((x) => !natKeys.has(x.key)).slice(0, 8), 2, () => sample(c.worldCards));
+  const ent = pick(withImg(real(news?.entertainment)).slice(0, 8), 2, () => sample(c.entertainment));
+  const sports = pick(withImg(real(news?.sports)).slice(0, 8), 2, () => sample(c.sports));
+  const health = pick(withImg(real(news?.health)).slice(0, 8), 2, () => sample(c.health));
+  const premium = pick(withImg(real(news?.premium)).slice(0, 8), 2, () => sample(c.premium));
 
   // ---- video: YouTube clips first, topped up with video stories ----
   const clips: Card[] = (news?.videos ?? []).map((v) => ({ key: v.id, title: v.title, img: v.img, href: `https://www.youtube.com/watch?v=${v.youtube}`, external: true }));
-  const realVideos = [...clips, ...withImg(real(news?.videoStories))].slice(0, 5);
+  const realVideos = [...clips, ...withImg(real(news?.videoStories))].slice(0, 3);
   const youtube = SOCIALS.find((x) => x.name === "YouTube")?.href;
-  const shorts: Card[] = realVideos.length
-    ? [...realVideos, ...(youtube ? [{ key: "yt-more", title: lang === "hi" ? "YouTube पर और वीडियो देखें" : "More videos on our YouTube channel", href: youtube, external: true, more: true }] : [])]
-    : c.shorts.map((s, i) => ({ key: `sh${i}`, title: s.title, href: storyHref(s.title), img: s.img, meta: s.dur }));
+  const moreVideos = lang === "hi" ? "YouTube पर और वीडियो देखें" : "More videos on our YouTube channel";
+  const videoCards: Card[] = realVideos.length
+    ? [...realVideos, ...(youtube ? [{ key: "yt-more", title: moreVideos, href: youtube, external: true, more: true }] : [])]
+    : c.shorts.slice(0, 4).map((s, i) => ({ key: `sh${i}`, title: s.title, href: storyHref(s.title), img: s.img, meta: s.dur }));
 
   return (
     <div className="home">
       {/* ---------- hero ---------- */}
+      {/* lead story (photo beside headline) with two rows of cards under it; live TV and the latest list share the side column */}
       <div className="r-hero">
-        <div className="pad26 br">
-          <div className="lead-meta">
-            <span className="tag tag-accent">{t.topStory}</span>
-            {lead.meta && <span className="lm">{lead.meta}</span>}
-          </div>
-          <CardLink card={lead} className="lk">
-            <Ph src={lead.img ?? "/taaza/lead.jpg"} className="ar-16-9" />
-            <h1 className="m-h1">{lead.title}</h1>
-            {lead.key === "lead" && <p className="m-lede">{t.leadBody}</p>}
+        <div className="hero-main">
+          <CardLink card={lead} className="lk hero-lead">
+            <Ph src={lead.img ?? "/taaza/lead.jpg"} className="ar-16-10" />
+            <div className="hero-lead-txt">
+              <span className="tag tag-accent">{t.topStory}</span>
+              {lead.meta && <div className="meta">{lead.meta}</div>}
+              <h1 className="m-h1 hv-t">{lead.title}</h1>
+              {lead.key === "lead" && <p className="m-lede">{t.leadBody}</p>}
+            </div>
           </CardLink>
-          <div className="subs">
-            {subs.map((s) => (
-              <CardLink key={s.key} card={s} className="lk">
-                <div className="kick">{s.kicker ?? t.breaking}</div>
-                <div className="st hv-t">{s.title}</div>
-                {s.meta && <div className="meta">{s.meta}</div>}
-              </CardLink>
-            ))}
+          <div className="hero-subs">
+            {subs.map((s, i) => <NewsCard key={s.key} card={{ ...s, kicker: s.kicker ?? t.breaking }} i={i + 1} />)}
           </div>
         </div>
 
-        <div className="pad26 br">
-          <div className="latest-head">
-            <span>{t.latest}</span>
-            <Link href="/category/national" className="vm">{t.viewMore}</Link>
+        <aside className="hero-side">
+          <div className="wl-box">
+            <Link href="/live-tv" className="lk wl-head"><span className="blink" /><span>{t.watchLive}</span></Link>
+            <div className="ph ar-16-9 wl-player">
+              <LivePlayer compact />
+              <span className="wl-live"><i />LIVE</span>
+            </div>
+            <Link href="/live-tv" className="lk">
+              <div className="wl-title hv-t">{onAir >= 0 ? c.schedule[onAir].show : t.liveShow}</div>
+            </Link>
           </div>
-          {latest.map((s, i) => (
-            <CardLink key={s.key} card={s} className="lk latest-item">
-              <span className="latest-n">{i + 1}</span>
-              <div>
-                <div className="latest-t">{s.title}</div>
-                {s.meta && <div className="meta">{s.meta}</div>}
-              </div>
-              {s.img && <Ph src={s.img} className="app-thumb" />}
-            </CardLink>
-          ))}
-        </div>
-
-        <div className="pad26">
-          <Link href="/live-tv" className="lk wl-head"><span className="blink" /><span>{t.watchLive}</span></Link>
-          <div className="ph ar-16-9 wl-player">
-            <LivePlayer compact />
-            <span className="wl-live"><i />LIVE</span>
-          </div>
-          <Link href="/live-tv" className="lk">
-            <div className="wl-title hv-t">{onAir >= 0 ? c.schedule[onAir].show : t.liveShow}</div>
-          </Link>
-          <div className="mw">
-            <div className="mw-head">{t.mostWatched}</div>
-            {watched.map((v) => (
-              <CardLink key={v.key} card={v} className="lk mw-item">
-                <Ph src={v.img ?? ""} />
-                <div className="hv-t">{v.title}</div>
+          <div className="latest">
+            <div className="latest-head">
+              <span>{t.latest}</span>
+              <Link href="/category/national" className="vm">{t.viewMore}</Link>
+            </div>
+            {latest.map((s, i) => (
+              <CardLink key={s.key} card={s} className="lk latest-item">
+                <Ph src={imgOf(s, i)} className="latest-img" />
+                <div className="latest-txt">
+                  {s.meta && <div className="meta">{s.meta}</div>}
+                  <div className="latest-t hv-t">{s.title}</div>
+                </div>
               </CardLink>
             ))}
           </div>
-        </div>
+        </aside>
       </div>
 
       {/* ---------- state news ---------- */}
@@ -170,61 +157,46 @@ export default function HomePage({ news }: { news?: HomeNews }) {
         <div className="r-3">
           <CardLink card={stateLead} className="lk st-lead">
             <Ph src={stateLead.img ?? "/taaza/state-lead.jpg"} className="ar-16-9" />
-            <div className="kick">{stateLead.kicker ?? (lang === "hi" ? STATE_HI[stateName] : stateName.toUpperCase())}</div>
             <div className="tt hv-t">{stateLead.title}</div>
             {stateLead.meta && <div className="meta">{stateLead.meta}</div>}
           </CardLink>
-          <div className="st-col">
-            {stateList.slice(0, 3).map((s) => <CardLink key={s.key} card={s} className="lk st-row"><RowBody card={s} /></CardLink>)}
-          </div>
-          <div className="st-col last">
-            {stateList.slice(3, 6).map((s) => <CardLink key={s.key} card={s} className="lk st-row"><RowBody card={s} /></CardLink>)}
+          <div className="st-grid">
+            {stateList.slice(0, 6).map((s, i) => <NewsCard key={s.key} card={s} i={i} />)}
           </div>
         </div>
       </div>
 
       {/* ---------- national + international ---------- */}
-      <div className="r-2">
-        <div className="pad28 br">
-          <SecHead title={t.nationalNews} red href="/category/national" />
-          <CardLink card={natLead} className="lk nat-lead">
-            <Ph src={natLead.img ?? "/taaza/national-lead.jpg"} className="ar-2-1" />
-            <div className="tt hv-t">{natLead.title}</div>
-          </CardLink>
-          {natRows.map((n) => <CardLink key={n.key} card={n} className="lk nat-row"><RowBody card={n} /></CardLink>)}
+      <section className="band">
+        <SecHead title={t.nationalNews} red href="/category/national" />
+        <div className="band-grid">
+          {national.map((n, i) => <NewsCard key={n.key} card={n} i={i + 1} />)}
         </div>
-        <div className="pad28">
-          <SecHead title={t.worldNews} href="/category/international-news" />
-          <div className="g2">
-            {world.map((w) => (
-              <CardLink key={w.key} card={w} className="lk card">
-                <Ph src={w.img ?? ""} className="ar-16-10" />
-                {w.kicker && <div className="kick">{w.kicker}</div>}
-                <div className="tt hv-t">{w.title}</div>
-                {w.meta && <div className="meta">{w.meta}</div>}
-              </CardLink>
-            ))}
-          </div>
+      </section>
+      <section className="band">
+        <SecHead title={t.worldNews} href="/category/international-news" />
+        <div className="band-grid">
+          {world.map((w, i) => <NewsCard key={w.key} card={w} i={i} />)}
         </div>
-      </div>
+      </section>
 
       {/* ---------- video ---------- */}
       <div className="video-sec">
         <SecHead title={t.videoNews} red href="/video" />
-        {(news?.shorts.length ?? 0) > 0 ? (
+        {(news?.ytVideos.length ?? 0) > 0 ? (
           <VideoGrid
-            videos={news!.shorts.slice(0, 5)}
-            className="g6"
-            itemClass="short"
-            more={youtube ? { href: youtube, label: lang === "hi" ? "YouTube पर और शॉर्ट्स देखें" : "More shorts on our YouTube channel" } : undefined}
+            videos={news!.ytVideos.slice(0, 3)}
+            className="g4"
+            itemClass="vwide"
+            more={youtube ? { href: youtube, label: moreVideos } : undefined}
           />
         ) : (
-        <div className="g6">
-          {shorts.map((s) => (
-            <CardLink key={s.key} card={s} className="lk short">
+        <div className="g4">
+          {videoCards.map((s) => (
+            <CardLink key={s.key} card={s} className="lk vwide">
               {s.more
                 ? <div className="ph yt-more"><span className="yt-more-ic"><svg viewBox="0 0 24 24" width="30" height="30" aria-hidden="true"><path fill="currentColor" d="M10 8.5v7l6-3.5z" /></svg></span></div>
-                : <Ph src={s.img ?? ""}>{s.meta && /^\d+:\d+$/.test(s.meta) && <span className="tag tag-accent">{s.meta}</span>}</Ph>}
+                : <Ph src={s.img ?? ""} className="v-wide">{s.meta && /^\d+:\d+$/.test(s.meta) && <span className="tag tag-accent">{s.meta}</span>}</Ph>}
               <div className="tt hv-t">{s.title}</div>
             </CardLink>
           ))}
@@ -233,68 +205,44 @@ export default function HomePage({ news }: { news?: HomeNews }) {
       </div>
 
       {/* ---------- entertainment + sports ---------- */}
-      <div className="r-2">
-        <div className="pad28 br">
-          <SecHead title={t.entNews} href="/category/entertainment" />
-          <div className="g3">
-            {ent.map((e) => (
-              <CardLink key={e.key} card={e} className="lk ent">
-                <Ph src={e.img ?? ""} className="ar-4-3" />
-                <div className="tt hv-t">{e.title}</div>
-                {e.meta && <div className="meta">{e.meta}</div>}
-              </CardLink>
-            ))}
-          </div>
+      <section className="band">
+        <SecHead title={t.entNews} href="/category/entertainment" />
+        <div className="band-grid">
+          {ent.map((e, i) => <NewsCard key={e.key} card={e} i={i} />)}
         </div>
-        <div className="pad28">
-          <SecHead title={t.sportsNews} red href="/category/sports" />
-          {sports.map((sp) => (
-            <CardLink key={sp.key} card={sp} className="lk thumb-row">
-              <Ph src={sp.img ?? ""} />
-              <div className="tt hv-t">{sp.title}</div>
-            </CardLink>
-          ))}
-          <div className="subcats">
-            {((news?.sportTiles.length ?? 0) >= 4 ? news!.sportTiles : c.subCats).map((sc) => (
-              <Link key={sc.img} href="/category/sports" className="lk subcat">
-                <Ph src={sc.img} className="ar-4-3" />
-                <div className="subcat-label">{sc.label}</div>
-              </Link>
-            ))}
-          </div>
+      </section>
+      <section className="band">
+        <SecHead title={t.sportsNews} red href="/category/sports" />
+        <div className="band-grid">
+          {sports.map((sp, i) => <NewsCard key={sp.key} card={sp} i={i} />)}
         </div>
-      </div>
+      </section>
 
       {/* ---------- health + premium ---------- */}
-      <div className="r-2 hp">
-        <div className="pad28 br">
-          <SecHead title={t.healthNews} href="/category/health" />
-          {health.map((h) => (
-            <CardLink key={h.key} card={h} className="lk thumb-row h">
-              <Ph src={h.img ?? ""} />
-              <div className="tt hv-t">{h.title}</div>
+      <section className="band">
+        <SecHead title={t.healthNews} href="/category/health" />
+        <div className="band-grid">
+          {health.map((h, i) => <NewsCard key={h.key} card={h} i={i} />)}
+        </div>
+      </section>
+      <section className="band">
+        <div className="sh">
+          <div className="prem-head-l">
+            <span className="sh-title"><span className="sh-dot" />{t.premiumNews}</span>
+            <span>{t.membersOnly}</span>
+          </div>
+          <Link href="/category/premium" className="become">{t.becomeMember}</Link>
+        </div>
+        <div className="band-grid">
+          {premium.map((p) => (
+            <CardLink key={p.key} card={p} className="lk card prem">
+              <Ph src={p.img ?? ""} className="ar-16-10">{!user && <span className="tag tag-neutral">{t.loginToRead}</span>}</Ph>
+              <div className="tt hv-t">{p.title}</div>
+              {p.meta && <div className="pm">{p.meta}</div>}
             </CardLink>
           ))}
         </div>
-        <div className="pad28">
-          <div className="sh">
-            <div className="prem-head-l">
-              <span className="sh-title"><span className="sh-dot" />{t.premiumNews}</span>
-              <span>{t.membersOnly}</span>
-            </div>
-            <Link href="/category/premium" className="become">{t.becomeMember}</Link>
-          </div>
-          <div className="g4">
-            {premium.map((p) => (
-              <CardLink key={p.key} card={p} className="lk prem">
-                <Ph src={p.img ?? ""} className="ar-4-3"><span className="tag tag-neutral">{t.loginToRead}</span></Ph>
-                <div className="tt hv-t">{p.title}</div>
-                {p.meta && <div className="pm">{p.meta}</div>}
-              </CardLink>
-            ))}
-          </div>
-        </div>
-      </div>
+      </section>
 
       {/* ---------- app promo (laptop only; phones get it in the footer) ---------- */}
       <div className="promo-wrap">
