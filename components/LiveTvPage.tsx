@@ -1,7 +1,6 @@
 "use client";
 
 import { useApp } from "./AppProvider";
-import { Ph } from "./ui";
 import { content } from "@/lib/data";
 import LivePlayer from "./LivePlayer";
 import { useOnAir } from "./useOnAir";
@@ -24,8 +23,12 @@ export default function LiveTvPage() {
         </div>
         <div className="chans">
           {c.channels.map((ch) => (
-            <div key={ch.img} style={{ cursor: "pointer" }}>
-              <Ph src={ch.img} className="ar-16-9" />
+            <div key={ch.label} style={{ cursor: "pointer" }}>
+              {/* branded tile rather than a stock photo */}
+              <div className="ph ar-16-9 chan-tile">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src="/taaza/logo.png" alt="" />
+              </div>
               <div className="lb">{ch.label}</div>
             </div>
           ))}

@@ -1,16 +1,20 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useApp } from "./AppProvider";
 import { Ph } from "./ui";
-import { CATEGORIES, STATE_HI, categoryLead, content } from "@/lib/data";
+import { CATEGORIES, STATE_HI, categoryLead, content, stateForSlug } from "@/lib/data";
 import { storyHref } from "@/lib/stories";
 import type { NewsItem, SportTile } from "@/lib/taaza";
 
 export default function CategoryPage({ slug, items = [], tiles = [] }: { slug: string; items?: NewsItem[]; tiles?: SportTile[] }) {
-  const { t, lang, stateName } = useApp();
+  const { t, lang, stateName, setStateName, loaded } = useApp();
   const [sort, setSort] = useState(0);
+  // opening a state's page switches the reader's edition to that state
+  // (after AppProvider has restored the saved edition, or it would overwrite this)
+  const pageState = stateForSlug(slug);
+  useEffect(() => { if (loaded && pageState) setStateName(pageState); }, [loaded, pageState, setStateName]);
   const c = content(lang);
   const cat = CATEGORIES[slug] ?? { en: slug, hi: slug };
   // real stories from taazatv.com when available, otherwise the sample content

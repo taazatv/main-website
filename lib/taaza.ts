@@ -15,7 +15,6 @@ export const OLD_CATEGORY: Record<string, string> = {
   sports: "Sports",
   health: "Health",
   premium: "Premium",
-  "election-2026": "ELECTION 2026",
   "medha-samman-2026": "Medha Samman 2026",
 };
 
@@ -116,8 +115,7 @@ export type HomeNews = {
   states: Record<StateName, NewsItem[]>;
   videos: VideoItem[];
   videoStories: NewsItem[];
-  shorts: YtVideo[];
-  sportTiles: SportTile[];
+  ytVideos: YtVideo[]; // full-length uploads, not shorts
 };
 
 /** Thrown when taazatv.com can't be reached, so a cached page keeps its last good news instead of sample content. */
@@ -132,21 +130,20 @@ export function failIfUnavailable(unavailable: boolean, what: string) {
 }
 
 export async function getHomeNews(): Promise<HomeNews> {
-  const [breaking, national, world, entertainment, sports, health, premium, wb, bihar, jh, up, vid, shorts, sportTiles] = await Promise.all([
+  const [breaking, national, world, entertainment, sports, health, premium, wb, bihar, jh, up, vid, ytVideos] = await Promise.all([
     getBreaking(),
-    getCategory("national"),
-    getCategory("international-news"),
-    getCategory("entertainment"),
-    getCategory("sports"),
-    getCategory("health"),
-    getCategory("premium"),
+    getCategoryDeep("national"),
+    getCategoryDeep("international-news"),
+    getCategoryDeep("entertainment"),
+    getCategoryDeep("sports"),
+    getCategoryDeep("health"),
+    getCategoryDeep("premium"),
     getStateNews("West Bengal"),
     getStateNews("Bihar"),
     getStateNews("Jharkhand"),
     getStateNews("Uttar Pradesh"),
     getVideos(),
-    getYouTube("shorts"),
-    getSportTiles(),
+    getYouTube("videos"),
   ]);
   failIfUnavailable(breaking.length === 0 && national.length === 0, "taazatv.com unreachable");
   return {
@@ -154,8 +151,7 @@ export async function getHomeNews(): Promise<HomeNews> {
     states: { "West Bengal": wb, Bihar: bihar, Jharkhand: jh, "Uttar Pradesh": up },
     videos: vid.videos,
     videoStories: vid.stories,
-    shorts,
-    sportTiles,
+    ytVideos,
   };
 }
 

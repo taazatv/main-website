@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useApp } from "./AppProvider";
+import PremiumLock from "./PremiumLock";
+import ShareBar from "./ShareBar";
 import { Ph } from "./ui";
 import { content } from "@/lib/data";
 import { CONTACT } from "@/lib/links";
@@ -40,14 +42,6 @@ export default function ArticlePage({ slug }: { slug: string }) {
     setSaved((v) => !v);
   };
 
-  const share = async () => {
-    const url = window.location.href;
-    try {
-      if (navigator.share) await navigator.share({ title: story.title[lang], url });
-      else await navigator.clipboard.writeText(url);
-    } catch {}
-  };
-
   const readAloud = () => {
     const synth = window.speechSynthesis;
     if (!synth) return;
@@ -83,6 +77,37 @@ export default function ArticlePage({ slug }: { slug: string }) {
     photo: H ? "(फोटो: Taaza TV)" : "(Photo: Taaza TV)",
   };
 
+  const storyBody = (
+    <>
+      <div className="art-body">
+        {story.lead ? (
+          <>
+            <p>{copy.body[0]}</p>
+            <p>{copy.body[1]}</p>
+            <blockquote>
+              {H ? "\"ब्लॉक के हर भंडारण लाइसेंस का इसी हफ्ते ऑडिट होगा\" — ज़िलाधिकारी" : "\"Every storage licence in the block will be audited this week\" — District Magistrate"}
+            </blockquote>
+            <p>{copy.body[2]}</p>
+            <div className="glance">
+              <div className="kick">{t.atAGlance}</div>
+              <div className="gl">
+                {copy.highlights.map((h) => <div key={h}>• {h}</div>)}
+              </div>
+            </div>
+            <p>{copy.body[3]}</p>
+          </>
+        ) : (
+          copy.body.map((p) => <p key={p}>{p}</p>)
+        )}
+      </div>
+
+      <div className="art-tags">
+        <span className="kick">{L.tags}:</span>
+        {copy.tags.map((tg) => <span key={tg} className="tag tag-neutral">{tg}</span>)}
+      </div>
+    </>
+  );
+
   return (
     <>
       <div className="art">
@@ -111,42 +136,19 @@ export default function ArticlePage({ slug }: { slug: string }) {
                 </svg>
                 {speaking ? L.stop : L.read}
               </button>
-              <button className="btn btn-secondary" onClick={share}>{t.share}</button>
               <button className={`btn btn-secondary ${saved ? "is-on" : ""}`} onClick={toggleSave}>{saved ? "✓ " : ""}{t.save}</button>
             </div>
           </div>
+          <ShareBar title={story.title[lang]} />
 
           <Ph src={story.img} className="art-hero">
             {story.video && <span className="art-play"><span className="play-tri" /></span>}
           </Ph>
           <div className="caption">{story.title[lang]} {L.photo}</div>
 
-          <div className="art-body">
-            {story.lead ? (
-              <>
-                <p>{copy.body[0]}</p>
-                <p>{copy.body[1]}</p>
-                <blockquote>
-                  {H ? "\"ब्लॉक के हर भंडारण लाइसेंस का इसी हफ्ते ऑडिट होगा\" — ज़िलाधिकारी" : "\"Every storage licence in the block will be audited this week\" — District Magistrate"}
-                </blockquote>
-                <p>{copy.body[2]}</p>
-                <div className="glance">
-                  <div className="kick">{t.atAGlance}</div>
-                  <div className="gl">
-                    {copy.highlights.map((h) => <div key={h}>• {h}</div>)}
-                  </div>
-                </div>
-                <p>{copy.body[3]}</p>
-              </>
-            ) : (
-              copy.body.map((p) => <p key={p}>{p}</p>)
-            )}
-          </div>
-
-          <div className="art-tags">
-            <span className="kick">{L.tags}:</span>
-            {copy.tags.map((tg) => <span key={tg} className="tag tag-neutral">{tg}</span>)}
-          </div>
+          {story.premium ? (
+            <PremiumLock teaser={<div className="art-body"><p>{copy.body[0]}</p></div>}>{storyBody}</PremiumLock>
+          ) : storyBody}
 
           <section className="comments">
             <div className="side-head">{L.comments} ({comments.length})</div>
