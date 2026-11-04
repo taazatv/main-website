@@ -246,7 +246,7 @@ export default function Header({ headlines = [], ad }: { headlines?: { title: st
       </div>
 
       {/* ad */}
-      <div className="m-ad">
+      <div className="m-strip">
         {ad ? (
           <a href={ad.href} target="_blank" rel="noopener noreferrer sponsored">
             <picture>

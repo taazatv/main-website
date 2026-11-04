@@ -81,9 +81,9 @@ export default function AdvertisePage() {
   return (
     <div className="careers">
       {/* compact banner: pitch on the left, a collage of our own event photos on the right, key numbers below */}
-      <section className="ad-top">
-        <div className="ad-top-txt">
-          <span className="ad-top-kick">{H ? "हमारे साथ विज्ञापन करें" : "ADVERTISE WITH US"}</span>
+      <section className="biz-top">
+        <div className="biz-top-txt">
+          <span className="biz-top-kick">{H ? "हमारे साथ विज्ञापन करें" : "ADVERTISE WITH US"}</span>
           <h1>
             {H ? <>TV, अख़बार, डिजिटल और इवेंट्स पर <em>लाखों लोगों</em> तक पहुंचें</> : <>Reach <em>millions</em> across TV, print, digital and events</>}
           </h1>
@@ -92,12 +92,12 @@ export default function AdvertisePage() {
               ? "Taaza TV चैनल, छपते छपते अख़बार, वेबसाइट, ऐप, सोशल मीडिया और हमारे बड़े इवेंट्स, सब एक ही पार्टनर के साथ।"
               : "One partner for the Taaza TV channel, the Chhapte Chhapte newspaper, our website, app and social media, and East India's biggest events."}
           </p>
-          <div className="ad-top-ctas">
+          <div className="biz-top-ctas">
             <a href="#enquire" className="cr-btn">{H ? "अभी संपर्क करें" : "Enquire now"}</a>
-            <a href={tel(CONTACT.phones[0])} className="ad-top-call">{H ? "कॉल करें" : "Call"} {CONTACT.phones[0]}</a>
+            <a href={tel(CONTACT.phones[0])} className="biz-top-call">{H ? "कॉल करें" : "Call"} {CONTACT.phones[0]}</a>
           </div>
         </div>
-        <div className="ad-top-mosaic" aria-hidden="true">
+        <div className="biz-top-mosaic" aria-hidden="true">
           {["Taaza Dandiya", "Youngotsav", "Medha Samman"].map((name) => {
             const img = EVENTS.find((e) => e.name === name)?.img;
             // eslint-disable-next-line @next/next/no-img-element
@@ -105,14 +105,14 @@ export default function AdvertisePage() {
           })}
         </div>
       </section>
-      <div className="ad-top-stats">
+      <div className="biz-top-stats">
         {[
           { n: "50,000+", en: "Taaza Dandiya visitors a year", hi: "हर साल Taaza Dandiya में लोग" },
           { n: "3 lakh+", en: "college students via Youngotsav", hi: "Youngotsav से कॉलेज छात्र" },
           { n: "115", en: "schools in Kwizdom", hi: "Kwizdom में स्कूल" },
           { n: "20,000+", en: "toppers honoured at Medha Samman", hi: "Medha Samman में सम्मानित टॉपर्स" },
         ].map((st) => (
-          <div key={st.n} className="ad-top-stat"><strong>{st.n}</strong><span>{H ? st.hi : st.en}</span></div>
+          <div key={st.n} className="biz-top-stat"><strong>{st.n}</strong><span>{H ? st.hi : st.en}</span></div>
         ))}
       </div>
 
@@ -123,8 +123,8 @@ export default function AdvertisePage() {
           {REACH.map((r) => {
             const [t, d] = H ? r.hi : r.en;
             return (
-              <div key={t} className="cr-card ad-reach">
-                <span className="ad-ic"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d={r.icon} /></svg></span>
+              <div key={t} className="cr-card biz-reach">
+                <span className="biz-ic"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d={r.icon} /></svg></span>
                 <h3>{t}</h3>
                 <p>{d}</p>
               </div>
@@ -213,17 +213,17 @@ export default function AdvertisePage() {
         <div className="cr-apply-info">
           <h2 className="cr-h2">{H ? "हमसे बात करें" : "Talk to us"}</h2>
           <p className="cr-lede">{H ? "फॉर्म भरें, या सीधे हमारी विज्ञापन टीम से संपर्क करें।" : "Fill in the form, or reach our advertising team directly."}</p>
-          <div className="ad-contacts">
-            <a href={`mailto:${CONTACT.email}?subject=Advertising%20enquiry`} className="ad-contact">
-              <span className="ad-ic"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M4 4h16v16H4zM4 6l8 7 8-7" /></svg></span>
+          <div className="biz-contacts">
+            <a href={`mailto:${CONTACT.email}?subject=Advertising%20enquiry`} className="biz-contact">
+              <span className="biz-ic"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M4 4h16v16H4zM4 6l8 7 8-7" /></svg></span>
               <span><small>{H ? "ईमेल" : "Email"}</small>{CONTACT.email}</span>
             </a>
-            <a href={tel(CONTACT.phones[0])} className="ad-contact">
-              <span className="ad-ic"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2z" /></svg></span>
+            <a href={tel(CONTACT.phones[0])} className="biz-contact">
+              <span className="biz-ic"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2z" /></svg></span>
               <span><small>{H ? "फ़ोन" : "Phone"}</small>{CONTACT.phones.join(" / ")}</span>
             </a>
-            <a href={CONTACT.whatsappLink} target="_blank" rel="noopener noreferrer" className="ad-contact">
-              <span className="ad-ic"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M21 11.5a8.4 8.4 0 0 1-12.5 7.4L3 21l2.1-5.4A8.5 8.5 0 1 1 21 11.5z" /></svg></span>
+            <a href={CONTACT.whatsappLink} target="_blank" rel="noopener noreferrer" className="biz-contact">
+              <span className="biz-ic"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M21 11.5a8.4 8.4 0 0 1-12.5 7.4L3 21l2.1-5.4A8.5 8.5 0 1 1 21 11.5z" /></svg></span>
               <span><small>WhatsApp</small>{CONTACT.whatsapp}</span>
             </a>
           </div>
