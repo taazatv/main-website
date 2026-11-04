@@ -103,6 +103,7 @@ export const CATEGORIES: Record<string, { en: string; hi: string }> = {
   "international-news": { en: "International News", hi: "दुनिया" },
   sports: { en: "Sports", hi: "खेल" },
   health: { en: "Health", hi: "हेल्थ" },
+  breaking: { en: "Breaking News", hi: "ब्रेकिंग न्यूज़" },
   ...Object.fromEntries(STATES.map((s) => [STATE_SLUG[s], { en: s, hi: STATE_HI[s] }])),
 };
 

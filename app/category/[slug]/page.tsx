@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import CategoryPage from "@/components/CategoryPage";
 import { CATEGORIES, stateForSlug } from "@/lib/data";
-import { OLD_CATEGORY, failIfUnavailable, getCategoryDeep, getSportTiles, getStateNews } from "@/lib/taaza";
+import { OLD_CATEGORY, failIfUnavailable, getBreaking, getCategoryDeep, getSportTiles, getStateNews } from "@/lib/taaza";
 
 export const revalidate = 300;
 
@@ -14,10 +14,10 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
   if (!CATEGORIES[slug]) notFound();
   const state = stateForSlug(slug);
   const [items, tiles] = await Promise.all([
-    state ? getStateNews(state) : OLD_CATEGORY[slug] ? getCategoryDeep(slug, 3) : [],
+    slug === "breaking" ? getBreaking() : state ? getStateNews(state) : OLD_CATEGORY[slug] ? getCategoryDeep(slug, 3) : [],
     slug === "sports" ? getSportTiles() : [],
   ]);
   // keep the last cached version rather than re-rendering with sample stories
-  failIfUnavailable(Boolean(state || OLD_CATEGORY[slug]) && items.length === 0, `category ${slug}`);
+  failIfUnavailable(Boolean(slug === "breaking" || state || OLD_CATEGORY[slug]) && items.length === 0, `category ${slug}`);
   return <CategoryPage key={slug} slug={slug} items={items} tiles={tiles} />;
 }

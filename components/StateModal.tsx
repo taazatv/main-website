@@ -1,15 +1,40 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useEffect, useRef } from "react";
 import { useApp } from "./AppProvider";
-import { STATE_HI, type StateName } from "@/lib/data";
-import { STATE_SHAPES } from "@/lib/stateShapes";
+import { STATE_HI, STATE_SLUG, type StateName } from "@/lib/data";
 
 const ORDER: StateName[] = ["West Bengal", "Bihar", "Uttar Pradesh", "Jharkhand"];
 
+/**
+ * One landmark photo per tile, from Wikimedia Commons (free licences that need a credit).
+ * Files are in public/taaza/states/, named after the state's slug.
+ */
+const PHOTOS: Record<string, { place: string; credit: string; file: string }> = {
+  national: { place: "India Gate, New Delhi", credit: "A. Savin, FAL", file: "India_Gate_in_New_Delhi_03-2016.jpg" },
+  "west-bengal": { place: "Victoria Memorial, Kolkata", credit: "Subhrajyoti07, CC BY-SA 4.0", file: "Victoria_Memorial_situated_in_Kolkata.jpg" },
+  bihar: { place: "Mahabodhi Temple, Bodh Gaya", credit: "Photo Dharma, CC BY 2.0", file: "Mahabodhi_Temple_-_Main_Sikhara_(9222239606).jpg" },
+  "uttar-pradesh": { place: "Taj Mahal, Agra", credit: "Yann / King of Hearts, CC BY-SA 4.0", file: "Taj_Mahal,_Agra,_India_edit2.jpg" },
+  jharkhand: { place: "Hundru Falls, Ranchi", credit: "Kingshuk Mondal, CC BY 4.0", file: "Hundru_Falls,_Jharkhand,_India.jpg" },
+};
+
+function Photo({ slug }: { slug: string }) {
+  const p = PHOTOS[slug];
+  return (
+    <span className="pick-art" aria-hidden="true">
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src={`/taaza/states/${slug}.jpg`} alt="" loading="lazy" title={`${p.place} · Photo: ${p.credit}, via Wikimedia Commons`} />
+    </span>
+  );
+}
+
 export default function StateModal() {
   const { stateModalOpen, setStateModalOpen, stateName, setStateName, lang, t } = useApp();
+  const router = useRouter();
   const modal = useRef<HTMLDivElement>(null);
+  const H = lang === "hi";
+  const close = () => setStateModalOpen(false);
 
   useEffect(() => {
     if (!stateModalOpen) return;
@@ -18,7 +43,7 @@ export default function StateModal() {
     const previousOverflow = document.body.style.overflow;
     if (frame) frame.inert = true;
     document.body.style.overflow = "hidden";
-    modal.current?.querySelector<HTMLButtonElement>("button")?.focus();
+    (modal.current?.querySelector<HTMLButtonElement>("button.pick.on") ?? modal.current?.querySelector<HTMLButtonElement>("button.pick"))?.focus();
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") { e.preventDefault(); setStateModalOpen(false); }
       if (e.key !== "Tab") return;
@@ -39,31 +64,48 @@ export default function StateModal() {
 
   if (!stateModalOpen) return null;
   return (
-    <div className="modal-bg" onClick={() => setStateModalOpen(false)}>
-      <div ref={modal} className="modal" role="dialog" aria-modal="true" aria-label={t.chooseState} onClick={(e) => e.stopPropagation()}>
-        <div className="modal-top">
-          <h3>{t.chooseState}</h3>
-          <button className="modal-x" title="Close" onClick={() => setStateModalOpen(false)}>
-            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" aria-hidden="true">
-              <path d="M18 6 6 18M6 6l12 12" />
-            </svg>
+    <div className="modal-bg auth-bg" onClick={close}>
+      <div ref={modal} className="auth-card picker" role="dialog" aria-modal="true" aria-label={t.chooseState} onClick={(e) => e.stopPropagation()}>
+        <h2 className="auth-title">{t.chooseState}</h2>
+        <p className="auth-sub">{H ? "अपने राज्य की खबरें चुनें, या पूरे देश की खबरें पढ़ें।" : "Pick your state for local news, or read news from across India."}</p>
+
+        <div className="picks">
+          {/* all-India news: opens the National section and keeps the reader's state edition */}
+          <button className="pick" onClick={() => { close(); router.push("/category/national"); }}>
+            <Photo slug="national" />
+            <span className="pick-nm">{H ? "देश" : "National"}</span>
+            <span className="pick-sub">{H ? "पूरे भारत की खबरें" : "All-India news"}</span>
           </button>
-        </div>
-        <div className="shapes">
           {ORDER.map((s) => (
-            <button
-              key={s}
-              className={`shape ${stateName === s ? "on" : ""}`}
-              aria-pressed={stateName === s}
-              onClick={() => { setStateName(s); setStateModalOpen(false); }}
-            >
-              <div className="box">
-                <svg viewBox="0 0 200 200" aria-hidden="true"><path d={STATE_SHAPES[s]} /></svg>
-              </div>
-              <span className="nm">{lang === "hi" ? STATE_HI[s] : s}</span>
+            <button key={s} className={`pick ${stateName === s ? "on" : ""}`} aria-pressed={stateName === s} onClick={() => { setStateName(s); close(); }}>
+              <Photo slug={STATE_SLUG[s]} />
+              <span className="pick-nm">{H ? STATE_HI[s] : s}</span>
+              <span className="pick-sub">{stateName === s ? (H ? "चुना हुआ" : "Selected") : (H ? "राज्य की खबरें" : "State news")}</span>
+              {stateName === s && (
+                <span className="pick-check" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="m5 12 5 5 9-10" /></svg>
+                </span>
+              )}
             </button>
           ))}
         </div>
+
+        <p className="pick-credit">
+          {H ? "फोटो: " : "Photos: "}
+          {Object.values(PHOTOS).map((p, i) => (
+            <span key={p.file}>
+              {i > 0 && " · "}
+              <a href={`https://commons.wikimedia.org/wiki/File:${p.file}`} target="_blank" rel="noopener noreferrer" tabIndex={-1}>{p.credit.split(",")[0]}</a>
+            </span>
+          ))}
+          {" — Wikimedia Commons"}
+        </p>
+
+        <button className="auth-x" aria-label={H ? "बंद करें" : "Close"} onClick={close}>
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" aria-hidden="true">
+            <path d="M18 6 6 18M6 6l12 12" />
+          </svg>
+        </button>
       </div>
     </div>
   );
