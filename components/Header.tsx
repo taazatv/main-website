@@ -98,7 +98,18 @@ export default function Header({ headlines = [], ad }: { headlines?: { title: st
               </a>
             ))}
           </div>
-          <Link href="/login" className="chip signin" title={user ? user.email : undefined}>
+          {/* signed out: open the sign-in popup and stay on this page (the /login href still works in a new tab);
+              signed in: the account page */}
+          <Link
+            href="/login"
+            className="chip signin"
+            title={user ? user.email : undefined}
+            onClick={(e) => {
+              if (user || e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return;
+              e.preventDefault();
+              askSignIn(pathname);
+            }}
+          >
             <span className="chip-ic">
               <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                 <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
@@ -182,7 +193,9 @@ export default function Header({ headlines = [], ad }: { headlines?: { title: st
           {NAV.map((n) => "group" in n ? (
             <details key={n.label}>
               <summary>{hindi ? n.hi : n.label}</summary>
-              {n.group.map((item) => <Link key={item.label} href={item.href} aria-current={isOn(item.href) ? "page" : undefined} onClick={() => { setMobileOpen(false); mobileToggle.current?.focus(); }}>{hindi ? item.hi : item.label}</Link>)}
+              {n.group.map((item) => /^https?:/.test(item.href)
+                ? <a key={item.label} href={item.href} target="_blank" rel="noopener noreferrer" onClick={() => setMobileOpen(false)}>{hindi ? item.hi : item.label} ↗</a>
+                : <Link key={item.label} href={item.href} aria-current={isOn(item.href) ? "page" : undefined} onClick={() => { setMobileOpen(false); mobileToggle.current?.focus(); }}>{hindi ? item.hi : item.label}</Link>)}
             </details>
           ) : (
             <Link key={n.label} href={n.href} aria-current={isOn(n.href) ? "page" : undefined} onClick={(e) => { setMobileOpen(false); mobileToggle.current?.focus(); gate(n.href, e); }}>{hindi ? n.hi : n.label}</Link>
@@ -202,9 +215,16 @@ export default function Header({ headlines = [], ad }: { headlines?: { title: st
           if (e.key === "Escape") { setMenu(null); menuTrigger.current?.focus(); }
         }}>
           {menu.items.map((it) => (
-            <a key={it.label} href={it.href} onClick={(e) => { e.preventDefault(); setMenu(null); router.push(it.href); }}>
-              {hindi ? it.hi : it.label}
-            </a>
+            // event sites (and any other outside link) open in a new tab
+            /^https?:/.test(it.href) ? (
+              <a key={it.label} href={it.href} target="_blank" rel="noopener noreferrer" onClick={() => setMenu(null)}>
+                {hindi ? it.hi : it.label} <span aria-hidden="true">↗</span>
+              </a>
+            ) : (
+              <a key={it.label} href={it.href} onClick={(e) => { e.preventDefault(); setMenu(null); router.push(it.href); }}>
+                {hindi ? it.hi : it.label}
+              </a>
+            )
           ))}
         </div>
       )}

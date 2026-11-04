@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useApp } from "./AppProvider";
 import { CONTACT } from "@/lib/links";
 import { SOCIALS } from "@/lib/data";
@@ -62,7 +63,8 @@ export default function ContactPage() {
           </p>
           <p>
             Write to <a href={`mailto:${CONTACT.email}`}>{CONTACT.email}</a> or call{" "}
-            {CONTACT.phones.map((p, i) => <span key={p}>{i > 0 && " / "}<a href={tel(p)}>{p}</a></span>)}.
+            {CONTACT.phones.map((p, i) => <span key={p}>{i > 0 && " / "}<a href={tel(p)}>{p}</a></span>)}, or see
+            what we offer on the <Link href="/advertise">Advertise page</Link>.
           </p>
         </section>
 
@@ -71,7 +73,8 @@ export default function ContactPage() {
           <p>
             We are constantly in search of dynamic, budding and experienced team members. Think you can fit in our
             ever-expanding team? Send your CV and preferred work domain to{" "}
-            <a href={`mailto:${CONTACT.email}?subject=Career%20application`}>{CONTACT.email}</a>.
+            <a href={`mailto:${CONTACT.email}?subject=Career%20application`}>{CONTACT.email}</a>, or apply on our{" "}
+            <Link href="/careers">Careers page</Link>.
           </p>
         </section>
       </div>

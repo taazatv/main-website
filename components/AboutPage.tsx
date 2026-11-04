@@ -1,6 +1,7 @@
 "use client";
 
 import { useApp } from "./AppProvider";
+import { STATE_PHOTOS, commonsUrl } from "@/lib/statePhotos";
 
 const HIGHLIGHTS = [
   "The only Hindi channel from Kolkata being seen across India",
@@ -56,6 +57,18 @@ export default function AboutPage() {
             so that they are well informed at all times. We are focused on ground reportage and on news that is of the
             greatest relevance to the viewers.
           </p>
+        </section>
+
+        {/* required by the photos' Creative Commons / Free Art licences */}
+        <section id="photo-credits" className="art-body photo-credits">
+          <div className="kick">PHOTO CREDITS</div>
+          <ul>
+            {Object.values(STATE_PHOTOS).map((p) => (
+              <li key={p.file}>
+                {p.place}: <a href={commonsUrl(p.file)} target="_blank" rel="noopener noreferrer">{p.author}</a>, {p.license}, via Wikimedia Commons
+              </li>
+            ))}
+          </ul>
         </section>
       </div>
     </div>

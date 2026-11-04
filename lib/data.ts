@@ -103,6 +103,7 @@ export const CATEGORIES: Record<string, { en: string; hi: string }> = {
   "international-news": { en: "International News", hi: "दुनिया" },
   sports: { en: "Sports", hi: "खेल" },
   health: { en: "Health", hi: "हेल्थ" },
+  breaking: { en: "Breaking News", hi: "ब्रेकिंग न्यूज़" },
   ...Object.fromEntries(STATES.map((s) => [STATE_SLUG[s], { en: s, hi: STATE_HI[s] }])),
 };
 
@@ -110,11 +111,12 @@ export const NAV: NavItem[] = [
   { label: "Home", hi: "होम", href: "/" },
   {
     label: "Events", hi: "इवेंट्स", group: [
-      { label: "Youngotsav", hi: "यंगोत्सव", href: "/category/medha-samman-2026" },
-      { label: "Medha Samman", hi: "मेधा सम्मान", href: "/category/medha-samman-2026" },
-      { label: "Kwizdom", hi: "क्विज़डम", href: "/category/medha-samman-2026" },
-      { label: "Taaza Dandiya", hi: "ताज़ा डांडिया", href: "/category/medha-samman-2026" },
-      { label: "Winter Carnival", hi: "विंटर कार्निवल", href: "/category/medha-samman-2026" },
+      { label: "Youngotsav", hi: "यंगोत्सव", href: "/events/youngotsav" },
+      { label: "Medha Samman", hi: "मेधा सम्मान", href: "/events/medha-samman" },
+      { label: "Kwizdom", hi: "क्विज़डम", href: "/events/kwizdom" },
+      { label: "Taaza Dandiya", hi: "ताज़ा डांडिया", href: "/events/taaza-dandiya" },
+      { label: "Winter Carnival", hi: "विंटर कार्निवल", href: "/events/winter-carnival" },
+      { label: "All events", hi: "सभी इवेंट्स", href: "/events" },
     ],
   },
   { label: "State", hi: "राज्य", group: STATES.map((s) => ({ label: s, hi: STATE_HI[s], href: `/category/${STATE_SLUG[s]}` })) },
@@ -455,7 +457,7 @@ export function content(lang: Lang) {
 
 export const footAHref = ["/", "/category/national", "/category/international-news", "/category/entertainment"];
 export const footBHref = ["/category/sports", "/category/health", "/video", "/live-tv"];
-export const footCHref = ["/about", "/about#mission", "/contact#advertise", "/contact#careers", "/contact", "https://taazatv.com/terms-conditions.php"];
+export const footCHref = ["/about", "/about#mission", "/advertise", "/careers", "/contact", "https://taazatv.com/terms-conditions.php"];
 
 export const SOCIALS = [
   { name: "Instagram", href: "https://www.instagram.com/taazatvchannel/", bg: "#d6249f", paths: ["M17 2H7a5 5 0 0 0-5 5v10a5 5 0 0 0 5 5h10a5 5 0 0 0 5-5V7a5 5 0 0 0-5-5z", "M16 11.4a4 4 0 1 1-3.4-3.4 4 4 0 0 1 3.4 3.4z", "M17.5 6.5h.01"] },
