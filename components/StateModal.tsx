@@ -4,27 +4,17 @@ import { useRouter } from "next/navigation";
 import { useEffect, useRef } from "react";
 import { useApp } from "./AppProvider";
 import { STATE_HI, STATE_SLUG, type StateName } from "@/lib/data";
+import { STATE_PHOTOS } from "@/lib/statePhotos";
 
 const ORDER: StateName[] = ["West Bengal", "Bihar", "Uttar Pradesh", "Jharkhand"];
 
-/**
- * One landmark photo per tile, from Wikimedia Commons (free licences that need a credit).
- * Files are in public/taaza/states/, named after the state's slug.
- */
-const PHOTOS: Record<string, { place: string; credit: string; file: string }> = {
-  national: { place: "India Gate, New Delhi", credit: "A. Savin, FAL", file: "India_Gate_in_New_Delhi_03-2016.jpg" },
-  "west-bengal": { place: "Victoria Memorial, Kolkata", credit: "Subhrajyoti07, CC BY-SA 4.0", file: "Victoria_Memorial_situated_in_Kolkata.jpg" },
-  bihar: { place: "Mahabodhi Temple, Bodh Gaya", credit: "Photo Dharma, CC BY 2.0", file: "Mahabodhi_Temple_-_Main_Sikhara_(9222239606).jpg" },
-  "uttar-pradesh": { place: "Taj Mahal, Agra", credit: "Yann / King of Hearts, CC BY-SA 4.0", file: "Taj_Mahal,_Agra,_India_edit2.jpg" },
-  jharkhand: { place: "Hundru Falls, Ranchi", credit: "Kingshuk Mondal, CC BY 4.0", file: "Hundru_Falls,_Jharkhand,_India.jpg" },
-};
-
+/** Landmark photo for a tile; its credit is on the About page. */
 function Photo({ slug }: { slug: string }) {
-  const p = PHOTOS[slug];
+  const p = STATE_PHOTOS[slug];
   return (
     <span className="pick-art" aria-hidden="true">
       {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src={`/taaza/states/${slug}.jpg`} alt="" loading="lazy" title={`${p.place} · Photo: ${p.credit}, via Wikimedia Commons`} />
+      <img src={`/taaza/states/${slug}.jpg`} alt="" loading="lazy" title={`${p.place} · Photo: ${p.author}, ${p.license}, via Wikimedia Commons`} />
     </span>
   );
 }
@@ -89,17 +79,6 @@ export default function StateModal() {
             </button>
           ))}
         </div>
-
-        <p className="pick-credit">
-          {H ? "फोटो: " : "Photos: "}
-          {Object.values(PHOTOS).map((p, i) => (
-            <span key={p.file}>
-              {i > 0 && " · "}
-              <a href={`https://commons.wikimedia.org/wiki/File:${p.file}`} target="_blank" rel="noopener noreferrer" tabIndex={-1}>{p.credit.split(",")[0]}</a>
-            </span>
-          ))}
-          {" — Wikimedia Commons"}
-        </p>
 
         <button className="auth-x" aria-label={H ? "बंद करें" : "Close"} onClick={close}>
           <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" aria-hidden="true">
