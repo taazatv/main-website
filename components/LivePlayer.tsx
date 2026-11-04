@@ -11,6 +11,15 @@ export default function LivePlayer({ compact = false }: { compact?: boolean }) {
   const video = useRef<HTMLVideoElement>(null);
   const [failed, setFailed] = useState(false);
   const [muted, setMuted] = useState(true);
+  // compact player: the full-screen button shows on hover, or for a few seconds after a tap
+  const [showFs, setShowFs] = useState(false);
+  const hideFs = useRef<ReturnType<typeof setTimeout>>(undefined);
+  useEffect(() => () => clearTimeout(hideFs.current), []);
+  const revealFs = () => {
+    setShowFs(true);
+    clearTimeout(hideFs.current);
+    hideFs.current = setTimeout(() => setShowFs(false), 3000);
+  };
 
   useEffect(() => {
     const el = video.current;
@@ -44,12 +53,31 @@ export default function LivePlayer({ compact = false }: { compact?: boolean }) {
     return () => { cancelled = true; hls?.destroy(); };
   }, []);
 
+  // compact player: native controls appear only while it is full screen
+  useEffect(() => {
+    if (!compact) return;
+    const onChange = () => { if (video.current) video.current.controls = document.fullscreenElement === video.current; };
+    document.addEventListener("fullscreenchange", onChange);
+    return () => document.removeEventListener("fullscreenchange", onChange);
+  }, [compact]);
+
   const toggleMute = () => {
     const el = video.current;
     if (!el) return;
     el.muted = !el.muted;
     setMuted(el.muted);
     if (!el.muted) el.play().catch(() => {});
+  };
+
+  /** Full screen with sound on; iPhone Safari only supports its own video full screen. */
+  const goFullScreen = () => {
+    const el = video.current as (HTMLVideoElement & { webkitEnterFullscreen?: () => void }) | null;
+    if (!el) return;
+    el.muted = false;
+    setMuted(false);
+    el.play().catch(() => {});
+    if (el.requestFullscreen) el.requestFullscreen().catch(() => el.webkitEnterFullscreen?.());
+    else el.webkitEnterFullscreen?.();
   };
 
   return (
@@ -63,7 +91,16 @@ export default function LivePlayer({ compact = false }: { compact?: boolean }) {
         autoPlay
         aria-label="Taaza TV live stream"
         onVolumeChange={(e) => setMuted(e.currentTarget.muted)}
+        // a tap on the small player reveals the full-screen button
+        onClick={compact ? () => { if (!document.fullscreenElement) revealFs(); } : undefined}
       />
+      {compact && (
+        <button className={`fs-btn${showFs ? " on" : ""}`} onClick={goFullScreen} aria-label="Watch live TV full screen" title="Full screen">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <path d="M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5" />
+          </svg>
+        </button>
+      )}
       {compact && (
         <button className="mute-btn" onClick={toggleMute} aria-pressed={!muted} aria-label={muted ? "Unmute live TV" : "Mute live TV"} title={muted ? "Unmute" : "Mute"}>
           <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">

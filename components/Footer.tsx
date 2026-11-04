@@ -25,7 +25,7 @@ export default function Footer() {
   const { t, lang } = useApp();
   const c = content(lang);
   return (
-    <footer className="foot on-dark">
+    <footer className="foot">
       <section className="mobile-app-download" aria-label={t.appKicker}>
         <span className="download-kicker">{t.appKicker}</span>
         <h2>{lang === "hi" ? "हर खबर, अब आपके साथ।" : "Your news. Wherever you go."}</h2>

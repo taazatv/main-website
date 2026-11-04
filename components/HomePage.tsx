@@ -7,7 +7,6 @@ import { Ph, SecHead } from "./ui";
 import { SOCIALS, STATES, STATE_HI, content, edition } from "@/lib/data";
 import { storyHref } from "@/lib/stories";
 import type { HomeNews, NewsItem } from "@/lib/taaza";
-import { useOnAir } from "./useOnAir";
 import LivePlayer from "./LivePlayer";
 import VideoGrid from "./VideoGrid";
 import { APP_LINKS } from "@/lib/links";
@@ -50,7 +49,6 @@ export default function HomePage({ news }: { news?: HomeNews }) {
   const { user } = useAuth();
   const c = content(lang);
   const sd = edition(lang, stateName);
-  const onAir = useOnAir(c.schedule);
 
   // ---- hero: newest breaking stories ----
   const breaking = real(news?.breaking);
@@ -67,7 +65,9 @@ export default function HomePage({ news }: { news?: HomeNews }) {
   // ---- state edition ----
   const stateCards = real(news?.states[stateName]);
   const stateLead: Card = withImg(stateCards).find((x) => x.key !== lead.key) ?? { key: "st", title: sd.lead.title, href: storyHref(sd.lead.title), img: "/taaza/state-lead.jpg", kicker: sd.lead.kicker, meta: sd.lead.meta };
-  const stateList = pick(stateCards.filter((x) => x.key !== stateLead.key).slice(0, 6), 3, () => sample(sd.list.map((title) => ({ title }))));
+  const stateAll = pick(stateCards.filter((x) => x.key !== stateLead.key).slice(0, 6), 3, () => sample(sd.list.map((title) => ({ title }))));
+  // whole rows of three only, so the grid never shows an empty slot
+  const stateList = stateAll.slice(0, stateAll.length - (stateAll.length % 3));
 
   // ---- category bands ----
   const national = pick(real(news?.national).slice(0, 8), 2, () =>
@@ -120,9 +120,6 @@ export default function HomePage({ news }: { news?: HomeNews }) {
               <LivePlayer compact />
               <span className="wl-live"><i />LIVE</span>
             </div>
-            <Link href="/live-tv" className="lk">
-              <div className="wl-title hv-t">{onAir >= 0 ? c.schedule[onAir].show : t.liveShow}</div>
-            </Link>
           </div>
           <div className="latest">
             <div className="latest-head">
@@ -250,7 +247,7 @@ export default function HomePage({ news }: { news?: HomeNews }) {
 
       {/* ---------- app promo (laptop only; phones get it in the footer) ---------- */}
       <div className="promo-wrap">
-        <div className="promo-app on-dark">
+        <div className="promo-app">
           <div className="pa-copy">
             <div className="k">{t.appKicker}</div>
             <div className="tt">{t.appTitle}</div>

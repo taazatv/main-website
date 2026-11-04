@@ -63,9 +63,13 @@ export async function getBreaking(): Promise<NewsItem[]> {
   return dedupe([...(a ? parseList(a) : []), ...(b ? parseList(b) : [])]);
 }
 
+/** A state's news from its first two pages (page 1 alone often has too few to fill the home grid). */
 export async function getStateNews(state: StateName): Promise<NewsItem[]> {
-  const html = await page(`state.php?sa=${q(state)}&usr_lang=en`);
-  return html ? parseList(html) : [];
+  const [a, b] = await Promise.all([
+    page(`state.php?sa=${q(state)}&usr_lang=en`),
+    page(`state.php?sa=${q(state)}&usr_lang=en&page=2`),
+  ]);
+  return dedupe([...(a ? parseList(a) : []), ...(b ? parseList(b) : [])]);
 }
 
 export async function getVideos(): Promise<{ videos: VideoItem[]; stories: NewsItem[] }> {
@@ -187,4 +191,21 @@ export async function getSportTiles(): Promise<SportTile[]> {
   }
   const order = ["Cricket", "Football", "Hockey", "Tennis"];
   return order.filter((l) => tiles.has(l)).map((label) => ({ label, img: tiles.get(label)! }));
+}
+
+/**
+ * News for one of Taaza TV's events (lib/events.ts). The old site's search page is broken, so this takes the
+ * event's own category if it has one, then stories whose titles mention the event in the busiest lists.
+ * Empty when nothing is about the event: the page then shows no news section rather than unrelated stories.
+ */
+export async function getEventNews(src: { category?: string; keywords: string[] }): Promise<NewsItem[]> {
+  const [own, state, ent, nat] = await Promise.all([
+    src.category ? getCategoryDeep(src.category, 2) : Promise.resolve([]),
+    getStateNews(DEFAULT_STATE),
+    getCategoryDeep("entertainment", 2),
+    getCategory("national"),
+  ]);
+  const keys = src.keywords.map((k) => k.toLowerCase());
+  const hit = (n: NewsItem) => keys.some((k) => n.title.toLowerCase().includes(k) || n.href.toLowerCase().includes(k.replace(/ /g, "-")));
+  return dedupe([...own, ...[...state, ...ent, ...nat].filter(hit)]).slice(0, 12);
 }
