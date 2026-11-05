@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useApp } from "./AppProvider";
 import { useAuth } from "./AuthProvider";
 import { Ph, SecHead } from "./ui";
-import { STATES, STATE_HI, content, edition } from "@/lib/data";
+import { STATES, STATE_HI, STATE_SLUG, content, edition } from "@/lib/data";
 import { storyHref } from "@/lib/stories";
 import type { HomeNews, NewsItem } from "@/lib/taaza";
 import LivePlayer from "./LivePlayer";
@@ -145,7 +145,7 @@ export default function HomePage({ news }: { news?: HomeNews }) {
           <div className="st-title">
             <span>{t.stateNews}</span>
           </div>
-          <Link href="/category/state" className="vm">{t.viewMore}</Link>
+          <Link href={`/category/${STATE_SLUG[stateName]}`} className="vm">{t.viewMore}</Link>
         </div>
         <div className="st-tabs">
           {STATES.map((s) => (
