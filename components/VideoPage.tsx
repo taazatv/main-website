@@ -54,7 +54,7 @@ export default function VideoPage({ feeds }: { feeds?: Feeds }) {
         )
       ) : hasAny ? (
         current.length > 0
-          ? <VideoGrid key={tab} videos={current} className="g-wide" itemClass="vwide" more={youtube ? { href: youtube, label: H ? "YouTube चैनल पर सब देखें" : "See everything on our YouTube channel" } : undefined} />
+          ? <VideoGrid key={tab} videos={current} className="g-wide" itemClass="vwide" hideViews more={youtube ? { href: youtube, label: H ? "YouTube चैनल पर सब देखें" : "See everything on our YouTube channel" } : undefined} />
           : <p className="v-empty">{H ? "अभी यहां कोई वीडियो नहीं है।" : "No videos here yet."}</p>
       ) : (
         <div className="g8">
@@ -62,7 +62,6 @@ export default function VideoPage({ feeds }: { feeds?: Feeds }) {
             <Link key={s.img} href={storyHref(s.title)} className="lk vh">
               <Ph src={s.img}><span className="tag tag-accent">{s.dur}</span></Ph>
               <div className="tt">{s.title}</div>
-              <div className="vw">{s.views}</div>
             </Link>
           ))}
         </div>

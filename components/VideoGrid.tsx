@@ -6,7 +6,7 @@ import type { YtVideo } from "@/lib/youtube";
 const fmtViews = (n: number) => (n >= 100000 ? `${(n / 100000).toFixed(1)}L views` : n >= 1000 ? `${(n / 1000).toFixed(1)}K views` : `${n} views`);
 
 /** Grid of YouTube videos/shorts that play in an on-page overlay instead of leaving the site. */
-export default function VideoGrid({ videos, className, itemClass, more }: { videos: YtVideo[]; className: string; itemClass: string; more?: { href: string; label: string } }) {
+export default function VideoGrid({ videos, className, itemClass, more, hideViews }: { videos: YtVideo[]; className: string; itemClass: string; more?: { href: string; label: string }; hideViews?: boolean }) {
   const [open, setOpen] = useState<YtVideo | null>(null);
   const closeBtn = useRef<HTMLButtonElement>(null);
 
@@ -30,7 +30,7 @@ export default function VideoGrid({ videos, className, itemClass, more }: { vide
               {v.short && <span className="tag tag-accent">SHORTS</span>}
             </div>
             <div className="tt hv-t">{v.title}</div>
-            {v.views > 0 && <div className="vw">{fmtViews(v.views)}</div>}
+            {!hideViews && v.views > 0 && <div className="vw">{fmtViews(v.views)}</div>}
           </button>
         ))}
         {more && (
