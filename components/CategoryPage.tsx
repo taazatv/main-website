@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useApp } from "./AppProvider";
 import { Ph } from "./ui";
-import { CATEGORIES, STATE_HI, categoryLead, content, stateForSlug } from "@/lib/data";
+import { CATEGORIES, STATES, STATE_HI, STATE_SLUG, categoryLead, content, stateForSlug } from "@/lib/data";
 import { storyHref } from "@/lib/stories";
 import type { NewsItem, SportTile } from "@/lib/taaza";
 
@@ -46,6 +46,16 @@ export default function CategoryPage({ slug, items = [], tiles = [] }: { slug: s
           ))}
         </div>
       </div>
+
+      {(pageState || slug === "state") && (
+        <nav className="st-tabs" aria-label={lang === "hi" ? "राज्य बदलें" : "Change state"}>
+          {STATES.map((s) => (
+            <Link key={s} href={`/category/${STATE_SLUG[s]}`} className={`st-tab ${pageState === s ? "on" : ""}`} aria-current={pageState === s ? "page" : undefined}>
+              {lang === "hi" ? STATE_HI[s] : s}
+            </Link>
+          ))}
+        </nav>
+      )}
 
       <div className="r-2 cat">
         <div className="pad28 br">

@@ -6,7 +6,7 @@ import { useEffect, useRef, useState } from "react";
 import { useApp } from "./AppProvider";
 import { useAuth } from "./AuthProvider";
 import AppLinks from "./AppLinks";
-import { NAV, SOCIALS, STATE_HI, type NavLeaf } from "@/lib/data";
+import { NAV, SOCIALS, STATE_HI, STATE_SLUG, type NavLeaf } from "@/lib/data";
 
 /** `hover`: opened by the mouse passing over, so it closes when the mouse leaves and doesn't take focus. */
 type Menu = { top: number; left: number; items: NavLeaf[]; hover?: boolean } | null;
@@ -60,6 +60,8 @@ export default function Header({ headlines = [], ad }: { headlines?: { title: st
     };
   }, [menu]);
 
+  // "State" opens the reader's own state, which can be changed from that page
+  const topics = MOBILE_TOPICS.map((x) => (x.href === "/category/state" ? { ...x, href: `/category/${STATE_SLUG[stateName]}` } : x));
   const isOn = (href: string) => (href === "/" ? pathname === "/" : pathname === href);
   // signed-out readers get the sign-in popup instead of the Premium section; it opens after they sign in
   const gate = (href: string, e: React.MouseEvent) => {
@@ -126,7 +128,7 @@ export default function Header({ headlines = [], ad }: { headlines?: { title: st
         if (e.key === "Escape" && mobileOpen) { setMobileOpen(false); mobileToggle.current?.focus(); }
       }}>
         <nav className="mobile-topics" aria-label={hindi ? "मुख्य खबरें" : "News sections"}>
-          {MOBILE_TOPICS.map((item) => <Link key={item.href} href={item.href} className="topic-link" aria-current={isOn(item.href) ? "page" : undefined} onClick={(e) => { setMobileOpen(false); gate(item.href, e); }}>
+          {topics.map((item) => <Link key={item.href} href={item.href} className="topic-link" aria-current={isOn(item.href) ? "page" : undefined} onClick={(e) => { setMobileOpen(false); gate(item.href, e); }}>
             {hindi ? item.hi : item.label}
           </Link>)}
           <button ref={mobileToggle} className="mobile-toggle topic-link" aria-expanded={mobileOpen} aria-controls="mobile-navigation" onClick={(e) => { e.currentTarget.focus(); setMobileOpen((v) => !v); }}>

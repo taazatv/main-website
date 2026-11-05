@@ -329,6 +329,7 @@ button { font: inherit; }
   padding: 9px 18px; border-radius: 14px; font-size: 13px; font-weight: 800; white-space: nowrap; cursor: pointer; border: 0;
   background: var(--nm-bg); color: var(--nm-ink); box-shadow: var(--nm-sm); transition: box-shadow 0.18s, color 0.18s;
 }
+a.st-tab { text-align: center; text-decoration: none; }
 .st-tab:hover { color: var(--color-accent-700); }
 .st-tab.on { background: #ec3013; color: #fff; box-shadow: var(--nm-red); }
 .r-3 { display: grid; grid-template-columns: 1.15fr 2fr; padding: 20px 26px 24px; }
