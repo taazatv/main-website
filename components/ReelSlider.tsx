@@ -6,8 +6,8 @@ import ReelGrid from "./ReelGrid";
 import type { IgReel } from "@/lib/instagram";
 
 /**
- * A row of reels that slides smoothly. Arrows are needed on laptops: each reel is an Instagram iframe,
- * which takes the mouse, so the row can't be dragged. Phones swipe it, so CSS hides the arrows there.
+ * A row of reels that slides smoothly. Arrows are needed on laptops, where a mouse can't drag the row.
+ * Phones swipe it, so CSS hides the arrows there.
  */
 export default function ReelSlider({ reels, more }: { reels: IgReel[]; more: { href: string; label: string } }) {
   const { lang } = useApp();
