@@ -324,7 +324,6 @@ button { font: inherit; }
 .st-head { display: flex; align-items: flex-end; justify-content: space-between; padding: 22px 26px 0; gap: 12px; }
 .st-title { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; }
 .st-title span:first-child { font-size: 22px; font-weight: 900; letter-spacing: -0.02em; text-transform: uppercase; }
-.st-title span:last-child { font-size: 11px; font-weight: 800; color: var(--color-neutral-600); letter-spacing: 0.12em; }
 .st-tabs { display: flex; flex-wrap: wrap; gap: 4px; margin: 16px 28px 0; padding: 5px; border-radius: 18px; background: var(--nm-bg); box-shadow: var(--nm-in); width: fit-content; }
 .st-tab {
   padding: 9px 18px; border-radius: 14px; font-size: 13px; font-weight: 800; white-space: nowrap; cursor: pointer; border: 0;
@@ -849,7 +848,6 @@ button { font: inherit; }
 .vh .ph { aspect-ratio: 9 / 16; display: flex; align-items: flex-end; padding: 7px; }
 .vh .tag { font-size: 10px; padding: 2px 6px; }
 .vh .tt { font-size: 12px; font-weight: 700; line-height: 1.25; margin-top: 6px; }
-.vh .vw { font-size: 10.5px; color: var(--color-neutral-600); font-weight: 600; margin-top: 3px; }
 
 /* ============ ABOUT / CONTACT ============ */
 .info { display: grid; gap: 34px; padding: 28px 28px 40px; border-bottom: 1px solid var(--nm-line); }
@@ -878,7 +876,7 @@ button { font: inherit; }
 .vbtn:hover .v-play { background: var(--color-accent); transform: translate(-50%, -50%) scale(1.06); }
 .v-short .tag, .v-wide .tag { font-size: 9.5px; padding: 2px 6px; }
 .g-wide { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; padding: 28px; border-bottom: 1px solid var(--nm-line); }
-.vwide .vw, .vh .vw { font-size: 10.5px; color: var(--color-neutral-600); font-weight: 600; margin-top: 3px; }
+.vwide .vw { font-size: 10.5px; color: var(--color-neutral-600); font-weight: 600; margin-top: 3px; }
 .g-wide .tt, .vwide .tt { font-size: 14px; font-weight: 700; line-height: 1.3; margin-top: 8px; }
 .vwide .yt-more { aspect-ratio: 16 / 9; }
 .v-empty { padding: 40px 28px; color: var(--color-neutral-600); font-weight: 600; }
@@ -890,19 +888,40 @@ button { font: inherit; }
 .vmodal-t { color: #fff; font-weight: 800; font-size: 15px; line-height: 1.3; margin-top: 10px; }
 
 /* Instagram reels: Instagram's embed player (header + 9:16 video + footer), so cards are a fixed height */
-.reel-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; padding: 24px 28px 32px; }
-.reel-card { position: relative; height: 680px; border-radius: 16px; overflow: hidden; background: #fff; box-shadow: var(--nm-sm); }
+.reel-grid { display: grid; grid-template-columns: repeat(auto-fill, 230px); justify-content: center; gap: 20px 18px; padding: 24px 28px 32px; }
+.reel-card { position: relative; width: 230px; height: 450px; border-radius: 14px; overflow: hidden; background: #fff; box-shadow: var(--nm-sm); transition: transform 0.15s; }
+.reel-card:hover { transform: translateY(-3px); }
 /* shown until Instagram's player paints over it (the embed can take a few seconds) */
 .reel-card:not(.ig-more)::before {
   content: "Loading reel…"; position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
   font-size: 13px; font-weight: 800; letter-spacing: 0.04em; color: #fff;
   background: linear-gradient(160deg, #f9a03f, #e1306c 45%, #833ab4); opacity: 0.85;
 }
-.reel-card iframe { position: relative; display: block; width: 100%; height: 100%; border: 0; background: transparent; }
+/* Instagram's player breaks when squeezed, so it renders at 340px wide and is scaled down to the card (230 / 340) */
+.reel-card iframe { position: relative; display: block; width: 340px; height: 665px; border: 0; background: transparent; transform: scale(0.6765); transform-origin: 0 0; }
 .ig-more { display: flex; flex-direction: column; gap: 14px; align-items: center; justify-content: center; color: #fff; background: linear-gradient(160deg, #f9a03f, #e1306c 45%, #833ab4); }
 .ig-more:hover { color: #fff; text-decoration: none; filter: brightness(1.05); }
-.ig-more-ic { display: flex; align-items: center; justify-content: center; width: 64px; height: 64px; border-radius: 18px; background: #fff; color: #e1306c; }
-.ig-more-t { font-size: 16px; font-weight: 900; text-align: center; padding: 0 20px; }
+.ig-more-ic { display: flex; align-items: center; justify-content: center; width: 56px; height: 56px; border-radius: 16px; background: #fff; color: #e1306c; }
+.ig-more-t { font-size: 15px; font-weight: 900; text-align: center; padding: 0 18px; }
+/* phones: one swipeable row instead of a very long column */
+@media (max-width: 600px) {
+  .reel-grid { grid-auto-flow: column; grid-template-columns: none; grid-auto-columns: 230px; justify-content: start; overflow-x: auto; scroll-snap-type: x proximity; padding: 18px clamp(10px, 3vw, 18px) 22px; }
+  .reel-card { scroll-snap-align: start; }
+}
+/* home page: one row of reels that slides smoothly (components/ReelSlider.tsx) */
+.reel-slider { position: relative; }
+.home-reels .reel-grid { grid-auto-flow: column; grid-template-columns: none; grid-auto-columns: 230px; justify-content: safe center; gap: 12px; padding: 4px 1px 12px; overflow-x: auto; overscroll-behavior-x: contain; scroll-behavior: smooth; scroll-snap-type: x mandatory; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+.home-reels .reel-grid::-webkit-scrollbar { display: none; }
+.home-reels .reel-card { scroll-snap-align: start; }
+.reel-arrow { position: absolute; top: calc(50% - 26px); z-index: 2; display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; padding: 0; border: 0; border-radius: 50%; background: var(--color-accent); color: #fff; box-shadow: 0 6px 16px rgba(17, 24, 39, 0.3); cursor: pointer; transition: background 0.15s, transform 0.15s; }
+.reel-arrow[hidden] { display: none; }
+.reel-arrow:hover { background: var(--color-accent-700); transform: scale(1.08); }
+.reel-arrow:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 3px; }
+.reel-arrow.prev { left: -6px; }
+.reel-arrow.next { right: -6px; }
+/* touch screens swipe the row */
+@media (hover: none) { .reel-arrow { display: none; } }
+@media (prefers-reduced-motion: reduce) { .home-reels .reel-grid { scroll-behavior: auto; } }
 .ig-cta { display: flex; align-items: center; gap: 16px; margin: 28px; padding: 22px 24px; border-radius: 20px; color: #fff; background: linear-gradient(120deg, #f9a03f, #e1306c 45%, #833ab4); box-shadow: var(--nm-sm); max-width: 520px; }
 .ig-cta:hover { color: #fff; text-decoration: none; filter: brightness(1.05); }
 .ig-cta-ic { flex: none; display: flex; align-items: center; justify-content: center; width: 58px; height: 58px; border-radius: 16px; background: rgba(255, 255, 255, 0.2); }

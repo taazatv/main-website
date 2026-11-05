@@ -4,15 +4,17 @@ import Link from "next/link";
 import { useApp } from "./AppProvider";
 import { useAuth } from "./AuthProvider";
 import { Ph, SecHead } from "./ui";
-import { SOCIALS, STATES, STATE_HI, content, edition } from "@/lib/data";
+import { STATES, STATE_HI, content, edition } from "@/lib/data";
 import { storyHref } from "@/lib/stories";
 import type { HomeNews, NewsItem } from "@/lib/taaza";
 import LivePlayer from "./LivePlayer";
 import VideoGrid from "./VideoGrid";
+import ReelSlider from "./ReelSlider";
+import { IG_PROFILE, REELS } from "@/lib/instagram";
 import { APP_LINKS } from "@/lib/links";
 
 /** One card's worth of data, whether it came from taazatv.com or the built-in sample content. */
-type Card = { key: string; title: string; href: string; img?: string; meta?: string; kicker?: string; external?: boolean; more?: boolean };
+type Card = { key: string; title: string; href: string; img?: string; meta?: string; kicker?: string; external?: boolean };
 
 const real = (items: NewsItem[] | undefined, kicker?: string): Card[] =>
   (items ?? []).map((x) => ({ key: x.id, title: x.title, href: x.href, img: x.img, meta: x.date, kicker }));
@@ -82,11 +84,9 @@ export default function HomePage({ news }: { news?: HomeNews }) {
 
   // ---- video: YouTube clips first, topped up with video stories ----
   const clips: Card[] = (news?.videos ?? []).map((v) => ({ key: v.id, title: v.title, img: v.img, href: `https://www.youtube.com/watch?v=${v.youtube}`, external: true }));
-  const realVideos = [...clips, ...withImg(real(news?.videoStories))].slice(0, 3);
-  const youtube = SOCIALS.find((x) => x.name === "YouTube")?.href;
-  const moreVideos = lang === "hi" ? "YouTube पर और वीडियो देखें" : "More videos on our YouTube channel";
+  const realVideos = [...clips, ...withImg(real(news?.videoStories))].slice(0, 4);
   const videoCards: Card[] = realVideos.length
-    ? [...realVideos, ...(youtube ? [{ key: "yt-more", title: moreVideos, href: youtube, external: true, more: true }] : [])]
+    ? realVideos
     : c.shorts.slice(0, 4).map((s, i) => ({ key: `sh${i}`, title: s.title, href: storyHref(s.title), img: s.img, meta: s.dur }));
 
   return (
@@ -144,7 +144,6 @@ export default function HomePage({ news }: { news?: HomeNews }) {
         <div className="st-head">
           <div className="st-title">
             <span>{t.stateNews}</span>
-            <span>{t.fromYourState}</span>
           </div>
           <Link href="/category/state" className="vm">{t.viewMore}</Link>
         </div>
@@ -186,18 +185,16 @@ export default function HomePage({ news }: { news?: HomeNews }) {
         <SecHead title={t.videoNews} red href="/video" />
         {(news?.ytVideos.length ?? 0) > 0 ? (
           <VideoGrid
-            videos={news!.ytVideos.slice(0, 3)}
+            videos={news!.ytVideos.slice(0, 4)}
             className="g4"
             itemClass="vwide"
-            more={youtube ? { href: youtube, label: moreVideos } : undefined}
+            hideViews
           />
         ) : (
         <div className="g4">
           {videoCards.map((s) => (
             <CardLink key={s.key} card={s} className="lk vwide">
-              {s.more
-                ? <div className="ph yt-more"><span className="yt-more-ic"><svg viewBox="0 0 24 24" width="30" height="30" aria-hidden="true"><path fill="currentColor" d="M10 8.5v7l6-3.5z" /></svg></span></div>
-                : <Ph src={s.img ?? ""} className="v-wide">{s.meta && /^\d+:\d+$/.test(s.meta) && <span className="tag tag-accent">{s.meta}</span>}</Ph>}
+              <Ph src={s.img ?? ""} className="v-wide">{s.meta && /^\d+:\d+$/.test(s.meta) && <span className="tag tag-accent">{s.meta}</span>}</Ph>
               <div className="tt hv-t">{s.title}</div>
             </CardLink>
           ))}
@@ -244,6 +241,14 @@ export default function HomePage({ news }: { news?: HomeNews }) {
           ))}
         </div>
       </section>
+
+      {/* ---------- Instagram reels ---------- */}
+      {REELS.length > 0 && (
+        <section className="band home-reels">
+          <SecHead title={lang === "hi" ? "इंस्टा रील्स" : "INSTA REELS"} red href="/video" />
+          <ReelSlider reels={REELS.slice(0, 8)} more={{ href: IG_PROFILE, label: lang === "hi" ? "Instagram पर सभी रील्स देखें" : "See all Reels on Instagram" }} />
+        </section>
+      )}
 
       {/* ---------- app promo (laptop only; phones get it in the footer) ---------- */}
       <div className="promo-wrap">
