@@ -26,6 +26,9 @@ export type Article = {
 
 export const ORIGIN = "https://taazatv.com";
 
+/** Old-site categories can be a list, e.g. "State, Premium". */
+export const isPremium = (a: Article) => /\bpremium\b/i.test(a.category ?? "");
+
 const decode = (s: string) =>
   s
     .replace(/&nbsp;/g, " ")
@@ -105,6 +108,28 @@ export function parseList(html: string): NewsItem[] {
   return [...items.values()]
     .filter((x) => x.title)
     .map((x) => ({ ...x, href: articleHref(x.id, x.title) }));
+}
+
+/**
+ * Stories on tags.php. Its results link to single-post.php, which parseList doesn't read (parseList would only find
+ * the sidebar's latest news, the same on every tag). Titles are read from the link text because a quote in a title
+ * breaks the href.
+ */
+export function parseTagResults(html: string): NewsItem[] {
+  const start = html.indexOf('class="container-fluid comm-news"');
+  if (start < 0) return [];
+  const end = html.indexOf('class="col-md-3', start);
+  return html
+    .slice(start, end > 0 ? end : undefined)
+    .split('class="bot-comm-news1"')
+    .slice(1)
+    .flatMap((block) => {
+      const id = block.match(/single-post\.php\?[^"]*?\bid=(\d+)/)?.[1];
+      const title = text(block.match(/<span[^>]*line-clamp[^>]*>([\s\S]*?)<\/span>/)?.[1] ?? "");
+      if (!id || !title) return [];
+      const img = block.match(/<img[^>]*src="(https?:\/\/[^"]+)"/)?.[1]?.replace(/ /g, "%20");
+      return [{ id, title, img, date: block.match(DATE_RE)?.[1], href: articleHref(id, title) }];
+    });
 }
 
 /** Videos on video.php: YouTube embeds with their captions. */

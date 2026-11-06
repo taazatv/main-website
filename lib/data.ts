@@ -119,7 +119,7 @@ export const NAV: NavItem[] = [
       { label: "All events", hi: "सभी इवेंट्स", href: "/events" },
     ],
   },
-  { label: "State", hi: "राज्य", group: STATES.map((s) => ({ label: s, hi: STATE_HI[s], href: `/category/${STATE_SLUG[s]}` })) },
+  { label: "State", hi: "राज्य", group: (["West Bengal", "Jharkhand", "Bihar", "Uttar Pradesh"] as StateName[]).map((s) => ({ label: s, hi: STATE_HI[s], href: `/category/${STATE_SLUG[s]}` })) },
   { label: "National", hi: "देश", href: "/category/national" },
   { label: "International", hi: "दुनिया", href: "/category/international-news" },
   { label: "Sports", hi: "खेल", href: "/category/sports" },

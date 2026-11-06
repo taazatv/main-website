@@ -1,9 +1,11 @@
 import Link from "next/link";
+import ArticleSummary from "./ArticleSummary";
 import PremiumLock from "./PremiumLock";
 import ShareBar from "./ShareBar";
 import { Ph, SecHead } from "./ui";
 import { CONTACT } from "@/lib/links";
 import { OLD_CATEGORY, type Article, type NewsItem } from "@/lib/taaza";
+import { isPremium } from "@/lib/taaza-parse";
 
 const slugForCategory = (name?: string) =>
   Object.entries(OLD_CATEGORY).find(([, v]) => v.toLowerCase() === name?.toLowerCase())?.[0];
@@ -49,7 +51,7 @@ export default function RealArticle({ a, related, sameCategory, more, url }: Pro
       {a.tags.length > 0 && (
         <div className="art-tags">
           <span className="kick">TAGS</span>
-          {a.tags.map((tag) => <span key={tag} className="tag tag-neutral">{tag}</span>)}
+          {a.tags.map((tag) => <Link key={tag} href={`/tag/${encodeURIComponent(tag)}`} className="tag tag-neutral">{tag}</Link>)}
         </div>
       )}
     </>
@@ -72,12 +74,16 @@ export default function RealArticle({ a, related, sameCategory, more, url }: Pro
           <ShareBar title={a.title} url={url} className="share-inline" />
         </div>
         {a.img && <Ph src={a.img} className="art-hero" />}
-        {/* old-site categories can be a list, e.g. "State, Premium" */}
-        {/\bpremium\b/i.test(a.category ?? "") ? (
+        {isPremium(a) ? (
           <PremiumLock teaser={<div className="art-body real-body" dangerouslySetInnerHTML={{ __html: teaserHtml(a) }} />}>
             {story}
           </PremiumLock>
-        ) : story}
+        ) : (
+          <>
+            <ArticleSummary id={a.id} />
+            {story}
+          </>
+        )}
       </article>
       <aside className="art-side">
         <div className="side-sticky">

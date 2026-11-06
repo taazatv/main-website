@@ -103,7 +103,7 @@ export default function ArticlePage({ slug }: { slug: string }) {
 
       <div className="art-tags">
         <span className="kick">{L.tags}:</span>
-        {copy.tags.map((tg) => <span key={tg} className="tag tag-neutral">{tg}</span>)}
+        {copy.tags.map((tg) => <Link key={tg} href={`/tag/${encodeURIComponent(tg)}`} className="tag tag-neutral">{tg}</Link>)}
       </div>
     </>
   );

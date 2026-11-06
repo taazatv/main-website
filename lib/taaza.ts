@@ -1,6 +1,6 @@
 import "server-only";
 import sanitizeHtml from "sanitize-html";
-import { ORIGIN, parseArticle, parseList, parseVideos, type Article, type NewsItem, type VideoItem } from "./taaza-parse";
+import { ORIGIN, parseArticle, parseList, parseTagResults, parseVideos, type Article, type NewsItem, type VideoItem } from "./taaza-parse";
 import type { StateName } from "./data";
 import { getYouTube, type YtVideo } from "./youtube";
 
@@ -86,6 +86,40 @@ export async function getArticle(id: string): Promise<Article | null> {
     return null;
   }
   return { ...a, bodyHtml: clean(a.bodyHtml) };
+}
+
+/**
+ * Stories matching a tag, from the old site's tags.php (6 a page). The tag must have no leading space, or it matches
+ * nothing. Null when the old site can't be reached, as opposed to an empty list for a tag with no stories.
+ */
+export async function getTagNews(tag: string, pages = 4): Promise<NewsItem[] | null> {
+  const htmls = await Promise.all(
+    Array.from({ length: pages }, (_, i) => page(`tags.php?ag=${q(tag.trim())}&usr_lang=en${i > 0 ? `&page=${i + 1}` : ""}`)),
+  );
+  if (!htmls[0]) return null;
+  return dedupe(htmls.flatMap((html) => (html ? parseTagResults(html) : [])));
+}
+
+const TAG_FILLER = new Set(["a", "an", "and", "at", "by", "for", "from", "in", "latest", "news", "of", "on", "the", "to", "with"]);
+
+/**
+ * Stories related to a tag of several words, for tags too specific to fill a page. tags.php matches parts of words
+ * ("fire" finds "firecrackers"), so only titles containing a whole word of the tag are kept; those with the most of
+ * its words come first, then the newest.
+ */
+export async function getRelatedTagNews(tag: string, exclude: NewsItem[], limit = 12): Promise<NewsItem[]> {
+  const words = [...new Set(tag.toLowerCase().split(/[^\p{L}\p{M}\p{N}]+/u))].filter((w) => w.length > 2 && !TAG_FILLER.has(w)).slice(0, 4);
+  if (words.length < 2) return [];
+  const lists = await Promise.all(words.map((w) => getTagNews(w, 2)));
+  const skip = new Set(exclude.map((x) => x.id));
+  const patterns = words.map((w) => new RegExp(`(?<![\\p{L}\\p{M}\\p{N}])${w}s?(?![\\p{L}\\p{M}\\p{N}])`, "iu"));
+  return dedupe(lists.flatMap((list) => list ?? []))
+    .filter((x) => !skip.has(x.id))
+    .map((item) => ({ item, score: patterns.filter((p) => p.test(item.title)).length }))
+    .filter((x) => x.score > 0)
+    .sort((a, b) => b.score - a.score || Number(b.item.id) - Number(a.item.id))
+    .slice(0, limit)
+    .map((x) => x.item);
 }
 
 function dedupe(items: NewsItem[]) {
