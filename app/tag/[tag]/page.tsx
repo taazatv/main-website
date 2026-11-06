@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Ph, SecHead } from "@/components/ui";
-import { failIfUnavailable, getRelatedTagNews, getTagNews, type NewsItem } from "@/lib/taaza";
+import { getRelatedTagNews, getTagNews, type NewsItem } from "@/lib/taaza";
+import { ORIGIN } from "@/lib/taaza-parse";
 
 export const revalidate = 300;
 
@@ -36,10 +37,26 @@ export default async function Page({ params }: { params: Promise<{ tag: string }
   const name = tagName((await params).tag);
   if (!name || name.length > 100) notFound();
   const found = await getTagNews(name);
-  // keep the last cached version rather than telling readers there is no news
-  failIfUnavailable(found === null, `tag ${name}`);
-  const items = found ?? [];
-  const related = found && items.length < FEW_STORIES ? await getRelatedTagNews(name, items) : [];
+  // Cloudflare sometimes blocks Vercel from the old site (see README). A tag may have no cached version to fall back
+  // on, so send readers to the same list there instead of showing an error page.
+  if (found === null) {
+    return (
+      <div>
+        <div className="cat-head">
+          <div>
+            <div className="cat-sup">TAG</div>
+            <h1 className="m-cat">{name}</h1>
+          </div>
+        </div>
+        <p className="v-empty">
+          This news couldn&apos;t load right now.{" "}
+          <a href={`${ORIGIN}/tags.php?ag=${encodeURIComponent(name)}&usr_lang=en`} target="_blank" rel="noopener noreferrer">See it on taazatv.com</a>
+        </p>
+      </div>
+    );
+  }
+  const items = found;
+  const related = items.length < FEW_STORIES ? await getRelatedTagNews(name, items) : [];
 
   return (
     <div>
