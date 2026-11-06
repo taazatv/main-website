@@ -77,7 +77,7 @@ export default function HomePage({ news }: { news?: HomeNews }) {
   // taazatv.com files some world stories under National too; don't show them twice
   const natKeys = new Set(national.map((x) => x.key));
   const world = pick(withImg(real(news?.world)).filter((x) => !natKeys.has(x.key)).slice(0, 8), 2, () => sample(c.worldCards));
-  const ent = pick(withImg(real(news?.entertainment)).slice(0, 8), 2, () => sample(c.entertainment));
+  const ent = pick(withImg(real(news?.entertainment)), 2, () => sample(c.entertainment)).slice(0, 4);
   const sports = pick(withImg(real(news?.sports)).slice(0, 8), 2, () => sample(c.sports));
   const health = pick(withImg(real(news?.health)).slice(0, 8), 2, () => sample(c.health));
   const premium = pick(withImg(real(news?.premium)).slice(0, 8), 2, () => sample(c.premium));
@@ -246,7 +246,7 @@ export default function HomePage({ news }: { news?: HomeNews }) {
       {REELS.length > 0 && (
         <section className="band home-reels">
           <SecHead title={lang === "hi" ? "इंस्टा रील्स" : "INSTA REELS"} red href="/video" />
-          <ReelSlider reels={REELS.slice(0, 8)} more={{ href: IG_PROFILE, label: lang === "hi" ? "Instagram पर सभी रील्स देखें" : "See all Reels on Instagram" }} />
+          <ReelSlider reels={REELS} more={{ href: IG_PROFILE, label: lang === "hi" ? "Instagram पर सभी रील्स देखें" : "See all Reels on Instagram" }} />
         </section>
       )}
 

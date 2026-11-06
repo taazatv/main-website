@@ -6,8 +6,17 @@ export const IG_PROFILE = "https://www.instagram.com/taazatvchannel/";
  * On Instagram open the reel → ⋯ / Share → "Copy link", and paste it here as a new line at the top.
  * Any reel or post link works, with or without the "?igsh=…" part.
  * Some reels only show "Watch on Instagram" in the embed and can't play here: leave those out.
+ * Leave out landscape reels too: the player is cut to a vertical 9:16 shape.
  */
 export const REEL_LINKS: string[] = [
+  "https://www.instagram.com/taazatvchannel/reel/DfZKr01BSde/",
+  "https://www.instagram.com/taazatvchannel/reel/DfW3_fdt2qv/",
+  "https://www.instagram.com/taazatvchannel/reel/DfWxInBNLQ_/",
+  "https://www.instagram.com/taazatvchannel/reel/DfUMUB9NOYv/",
+  "https://www.instagram.com/taazatvchannel/reel/DfUFc8BNtaA/",
+  "https://www.instagram.com/taazatvchannel/reel/DfT-p4itZ0B/",
+  "https://www.instagram.com/taazatvchannel/reel/DfT3s3-NQps/",
+  "https://www.instagram.com/taazatvchannel/reel/DfTxfQEhf_3/",
   "https://www.instagram.com/taazatvchannel/reel/DfSDpqvhBsq/",
   "https://www.instagram.com/taazatvchannel/reel/DfRvt4vhofm/",
   "https://www.instagram.com/taazatvchannel/reel/DfPR637BIT5/",
@@ -21,6 +30,8 @@ export const REEL_LINKS: string[] = [
 ];
 
 export type IgReel = { shortcode: string; permalink: string };
+
+export const reelEmbedUrl = (r: IgReel) => `https://www.instagram.com/reel/${r.shortcode}/embed/`;
 
 /** REEL_LINKS as embeddable reels; links that aren't Instagram reel/post links are skipped. */
 export const REELS: IgReel[] = REEL_LINKS.flatMap((link) => {
