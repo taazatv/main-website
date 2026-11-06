@@ -9,7 +9,7 @@ import { storyHref } from "@/lib/stories";
 import type { NewsItem, SportTile } from "@/lib/taaza";
 
 export default function CategoryPage({ slug, items = [], tiles = [] }: { slug: string; items?: NewsItem[]; tiles?: SportTile[] }) {
-  const { t, lang, stateName, setStateName, loaded } = useApp();
+  const { t, lang, setStateName, loaded } = useApp();
   const [sort, setSort] = useState(0);
   // opening a state's page switches the reader's edition to that state
   // (after AppProvider has restored the saved edition, or it would overwrite this)
@@ -37,7 +37,6 @@ export default function CategoryPage({ slug, items = [], tiles = [] }: { slug: s
     <div>
       <div className="cat-head">
         <div>
-          <div className="cat-sup">{t.category} · {lang === "hi" ? STATE_HI[stateName] : stateName}</div>
           <h1 className="m-cat">{lang === "hi" ? cat.hi : cat.en}</h1>
         </div>
         <div className="seg">
