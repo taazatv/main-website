@@ -1,7 +1,7 @@
 export type Lang = "en" | "hi";
 export type StateName = "West Bengal" | "Bihar" | "Jharkhand" | "Uttar Pradesh";
 
-export const STATES: StateName[] = ["West Bengal", "Bihar", "Jharkhand", "Uttar Pradesh"];
+export const STATES: StateName[] = ["West Bengal", "Jharkhand", "Bihar", "Uttar Pradesh"];
 export const STATE_SHORT: Record<StateName, string> = { "West Bengal": "WB", Bihar: "BR", Jharkhand: "JH", "Uttar Pradesh": "UP" };
 export const STATE_HI: Record<StateName, string> = { "West Bengal": "पश्चिम बंगाल", Bihar: "बिहार", Jharkhand: "झारखंड", "Uttar Pradesh": "उत्तर प्रदेश" };
 /** Category slug of each state's own news page ("/category/west-bengal"). */

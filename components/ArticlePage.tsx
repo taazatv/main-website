@@ -19,28 +19,17 @@ export default function ArticlePage({ slug }: { slug: string }) {
   const copy = articleCopy(story, lang);
   const c = content(lang);
   const related = relatedStories(story, 4);
-  const [saved, setSaved] = useState(false);
   const [speaking, setSpeaking] = useState(false);
   const [comments, setComments] = useState<Comment[]>([]);
   const [draft, setDraft] = useState("");
 
-  // per-story saved state + comments are kept in this browser only
+  // comments are kept in this browser only
   useEffect(() => {
     try {
-      setSaved(JSON.parse(localStorage.getItem("tt-saved") || "[]").includes(slug));
       setComments(JSON.parse(localStorage.getItem(`tt-comments-${slug}`) || "[]"));
     } catch {}
     return () => { if (typeof window !== "undefined") window.speechSynthesis?.cancel(); };
   }, [slug]);
-
-  const toggleSave = () => {
-    try {
-      const list: string[] = JSON.parse(localStorage.getItem("tt-saved") || "[]");
-      const next = list.includes(slug) ? list.filter((x) => x !== slug) : [...list, slug];
-      localStorage.setItem("tt-saved", JSON.stringify(next));
-    } catch {}
-    setSaved((v) => !v);
-  };
 
   const readAloud = () => {
     const synth = window.speechSynthesis;
@@ -136,7 +125,6 @@ export default function ArticlePage({ slug }: { slug: string }) {
                 </svg>
                 {speaking ? L.stop : L.read}
               </button>
-              <button className={`btn btn-secondary ${saved ? "is-on" : ""}`} onClick={toggleSave}>{saved ? "✓ " : ""}{t.save}</button>
             </div>
           </div>
           <ShareBar title={story.title[lang]} />

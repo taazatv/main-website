@@ -65,7 +65,7 @@ export default function Footer() {
           : <span key={g.name}>{lang === "hi" ? g.hi : g.name} — {g.desc}</span>)}
       </FooterGroup>
       <div className="fcopy">
-        <span>© 2026 Taaza TV. All rights reserved. • West Bengal · Bihar · Jharkhand · Uttar Pradesh</span>
+        <span>© 2026 Taaza TV. All rights reserved. • West Bengal · Jharkhand · Bihar · Uttar Pradesh</span>
         <span><a href={LEGAL.terms} target="_blank" rel="noopener noreferrer">Terms and Conditions</a> • <a href={LEGAL.privacy} target="_blank" rel="noopener noreferrer">Privacy Policy</a></span>
       </div>
     </footer>
