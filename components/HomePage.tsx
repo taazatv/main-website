@@ -24,10 +24,10 @@ const sample = (items: { title: string; img?: string; meta?: string; kicker?: st
 const pick = (r: Card[], min: number, fallback: () => Card[]) => (r.length >= min ? r : fallback());
 const withImg = (cards: Card[]) => cards.filter((x) => x.img);
 
-function CardLink({ card, className, children }: { card: Card; className: string; children: React.ReactNode }) {
+function CardLink({ card, className, children, onClick }: { card: Card; className: string; children: React.ReactNode; onClick?: (e: React.MouseEvent) => void }) {
   return card.external
-    ? <a href={card.href} target="_blank" rel="noopener noreferrer" className={className}>{children}</a>
-    : <Link href={card.href} className={className}>{children}</Link>;
+    ? <a href={card.href} target="_blank" rel="noopener noreferrer" className={className} onClick={onClick}>{children}</a>
+    : <Link href={card.href} className={className} onClick={onClick}>{children}</Link>;
 }
 
 /** Stock photos for stories that arrive without one, rotated so neighbouring cards differ. */
@@ -48,7 +48,13 @@ function NewsCard({ card, i }: { card: Card; i: number }) {
 
 export default function HomePage({ news }: { news?: HomeNews }) {
   const { t, lang, stateName, setStateName } = useApp();
-  const { user } = useAuth();
+  const { user, askSignIn } = useAuth();
+  // signed-out readers get the sign-in popup instead of a Premium story; it opens after they sign in
+  const gatePremium = (href: string, e: React.MouseEvent) => {
+    if (user) return;
+    e.preventDefault();
+    askSignIn(href);
+  };
   const c = content(lang);
   const sd = edition(lang, stateName);
 
@@ -229,11 +235,11 @@ export default function HomePage({ news }: { news?: HomeNews }) {
             <span className="sh-title"><span className="sh-dot" />{t.premiumNews}</span>
             <span>{t.membersOnly}</span>
           </div>
-          <Link href="/category/premium" className="become">{t.becomeMember}</Link>
+          <Link href="/category/premium" className="become" onClick={(e) => gatePremium("/category/premium", e)}>{t.becomeMember}</Link>
         </div>
         <div className="band-grid">
           {premium.map((p) => (
-            <CardLink key={p.key} card={p} className="lk card prem">
+            <CardLink key={p.key} card={p} className="lk card prem" onClick={(e) => gatePremium(p.href, e)}>
               <Ph src={p.img ?? ""} className="ar-16-10">{!user && <span className="tag tag-neutral">{t.loginToRead}</span>}</Ph>
               <div className="tt hv-t">{p.title}</div>
               {p.meta && <div className="pm">{p.meta}</div>}
