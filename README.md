@@ -40,7 +40,6 @@ The new website for **Taaza TV**, a national Hindi and English news channel from
   WhatsApp / Facebook / X share links.
 - **24×7 live TV** — the channel's HLS stream plays on the Live TV page and, muted with an unmute
   button, in the home page's *Watch Live* box.
-- **"On air now"** — the Live TV schedule highlights the current show using India time (IST).
 - **YouTube Shorts and videos** — from [@taazatv1632](https://www.youtube.com/@taazatv1632), played in
   an on-page overlay (Shorts on the home page; Shorts / Videos / Live tabs on `/video`).
 - **Header banner** — the same strip banner as taazatv.com, managed from the old admin panel.
@@ -116,7 +115,7 @@ components/
   ArticlePage.tsx         Renders a built-in sample story
   ArticleFallback.tsx     "Opening the story…" hand-off to taazatv.com when a story can't be fetched
   CategoryPage.tsx        Category listing
-  LiveTvPage.tsx          Player, channels, schedule
+  LiveTvPage.tsx          Live player
   LivePlayer.tsx          HLS player (hls.js / native), compact mode with mute toggle
   VideoGrid.tsx           YouTube grid + on-page player overlay
   VideoPage.tsx           Shorts / Videos / Live tabs
@@ -124,7 +123,7 @@ components/
   AppProvider.tsx         Client context: language, theme, selected state
   StateModal.tsx          "Choose your state" dialog
   AppLinks.tsx            Google Play / App Store buttons
-  useOnAir.ts             Which schedule slot is on air now (IST)
+  useOnAir.ts             Which schedule slot is on air now (IST); unused while the schedule is hidden
   ui.tsx                  <Ph> (background-image photo) and <SecHead> (section heading)
 
 lib/
@@ -224,7 +223,7 @@ muted because browsers block autoplay with sound. The stream has a single 1080p 
 | `/article/<id>-<slug>` | Imported story | taazatv.com |
 | `/article/<sample-slug>` | Built-in sample story (fallback only) | `lib/stories.ts` |
 | `/category/<slug>` | Category listing | taazatv.com |
-| `/live-tv` | Live player and schedule | Live stream; schedule is sample data |
+| `/live-tv` | Live player | Live stream |
 | `/video` | Shorts / Videos / Live tabs | YouTube feeds |
 | `/about` | About us, Mission & Vision | Static text from the old site |
 | `/contact` | Contact, Advertise (`#advertise`), Careers (`#careers`) | `lib/links.ts` |
@@ -303,8 +302,9 @@ To fix it, in taazatv.com's Cloudflare dashboard either:
 - **Change refresh times:** `REVALIDATE` in `lib/taaza.ts` (news, 300s) and `revalidate` in
   `lib/youtube.ts` (videos, 600s), plus the `export const revalidate` in each page.
 - **Update contact details or links:** `lib/links.ts`; social profiles in `SOCIALS` in `lib/data.ts`.
-- **Real TV schedule:** replace the sample `schedule` in `content()` in `lib/data.ts`. The *On air now*
-  highlight follows it automatically.
+- **Real TV schedule:** the schedule, channel tiles and *On air now* bar were removed from `/live-tv`.
+  The sample `schedule` and `channels` in `content()` in `lib/data.ts` and `components/useOnAir.ts` are
+  kept so they can be added back once a real schedule exists.
 
 ## Troubleshooting
 
@@ -326,8 +326,6 @@ To fix it, in taazatv.com's Cloudflare dashboard either:
   HTML, so the Hindi switch translates the interface but news stays in English.
 - **Instagram reels** can't be read without Meta's Instagram API (business account plus an access token);
   YouTube Shorts are used instead.
-- **Live TV schedule and extra channel tiles** on `/live-tv` are sample data until a real schedule is
-  provided.
 - **Most Watched** shows recent stories; the old site has no view counts.
 - **Bandwidth:** the live stream is 1080p only, so the always-on home player uses ~1.5–2 GB per hour on
   mobile data while visible.

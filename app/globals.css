@@ -827,7 +827,8 @@ a.st-tab { text-align: center; text-decoration: none; }
 .prem-lock .meta { margin: 0; }
 
 /* ============ LIVE TV ============ */
-.live { display: grid; grid-template-columns: 1fr 360px; border-bottom: 1px solid var(--nm-line); }
+.live { border-bottom: 1px solid var(--nm-line); }
+.live > .pad28 { max-width: 1100px; margin: 0 auto; }
 .player {
   position: relative; aspect-ratio: 16 / 9; background: #050c25; display: flex; align-items: flex-end;
   overflow: hidden; border-radius: 18px; box-shadow: var(--nm-sm);
@@ -847,25 +848,11 @@ a.st-tab { text-align: center; text-decoration: none; }
 .player .lv { pointer-events: none; z-index: 1; }
 .player-frame { object-fit: contain; }
 .player-err { position: absolute; inset: auto 12px 12px; z-index: 1; padding: 8px 12px; border-radius: 10px; background: rgba(0, 0, 0, 0.75); color: #fff; font-size: 13px; font-weight: 700; }
-.onair { display: flex; align-items: center; flex-wrap: wrap; gap: 8px 12px; padding: 14px 0; border-bottom: 1px solid var(--nm-line); margin-bottom: 14px; }
-.onair div { font-size: 20px; font-weight: 900; line-height: 1.2; letter-spacing: -0.01em; }
 .ctrl { display: flex; align-items: center; gap: 14px; padding: 12px 0; color: #dfe4f2; border-bottom: 1px solid var(--nm-line); }
 .ctrl .pl { width: 0; height: 0; border-left: 14px solid #f3f2f2; border-top: 9px solid transparent; border-bottom: 9px solid transparent; }
 .ctrl .bar { flex: 1; height: 5px; background: #d3d8e3; border-radius: 99px; overflow: hidden; }
 .ctrl .bar div { width: 64%; height: 100%; background: var(--color-accent); border-radius: 99px; }
 .ctrl span { font-size: 12px; font-weight: 700; }
-.chans { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
-.chans .lb { font-size: 12.5px; font-weight: 700; color: var(--color-text); margin-top: 7px; }
-.chan-tile { display: flex; align-items: center; justify-content: center; background: linear-gradient(140deg, #0b1636, #050c25); }
-.chan-tile img { width: 58%; height: auto; }
-.sched-head { border-bottom: 2px solid var(--nm-line-strong); padding-bottom: 10px; font-size: 15px; font-weight: 900; }
-.sched { display: flex; gap: 12px; padding: 11px 0; border-bottom: 1px solid var(--nm-line); }
-.sched.now { background: var(--color-accent-100); }
-.sched.now { box-shadow: inset 3px 0 0 var(--color-accent); padding-left: 10px; border-radius: 4px; }
-.sched-now { display: inline-flex; margin-left: 8px; padding: 2px 7px; border-radius: 6px; background: var(--color-accent); color: #fff; font-size: 9.5px; font-weight: 900; letter-spacing: 0.08em; vertical-align: middle; }
-.sched .tm { font-size: 12px; font-weight: 800; min-width: 56px; color: var(--color-neutral-700); }
-.sched .sw { font-size: 14.5px; font-weight: 800; line-height: 1.25; }
-.sched .hs { font-size: 11.5px; color: var(--color-neutral-600); font-weight: 600; margin-top: 3px; }
 
 /* ============ VIDEO HUB ============ */
 .g8 { display: grid; grid-template-columns: repeat(8, 1fr); gap: 12px; padding: 28px; border-bottom: 1px solid var(--nm-line); }
@@ -1189,12 +1176,10 @@ a.st-tab { text-align: center; text-decoration: none; }
   .promo-app .pa-phone { width: 130px; height: 200px; }
   .foot { padding: 32px 18px 20px; }
   .r-foot { gap: 24px 16px; }
-  .chans { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .player { display: block; aspect-ratio: auto; padding-top: 56.25%; }
   .player .bgimg { bottom: auto; height: auto; aspect-ratio: 16 / 9; background-size: contain; }
   .player .cap { background: #050c25; padding: 12px; }
   .player .cap div { font-size: 19px; }
-  .onair div { font-size: 17px; }
   .player .wm { top: 10px; right: 10px; }
   .player .wm img { height: 28px; }
   .byline .acts { margin-left: 0; }
