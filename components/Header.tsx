@@ -19,6 +19,7 @@ const MOBILE_TOPICS = [
   { label: "Sports", hi: "खेल", href: "/category/sports" },
   { label: "Video", hi: "वीडियो", href: "/video" },
   { label: "Premium", hi: "प्रीमियम", href: "/category/premium" },
+  { label: "Health", hi: "हेल्थ", href: "/category/health" },
 ];
 const PREMIUM = "/category/premium";
 const MOBILE_LIVE ={ label: "Live TV", hi: "लाइव TV", href: "/live-tv" };
